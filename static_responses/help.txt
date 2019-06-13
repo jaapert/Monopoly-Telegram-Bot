@@ -1,0 +1,13 @@
+Here's a list of helpful commands:
+
+-The /start command will start the bot.
+-The /rules command will display a list of rules.
+-The /feedback [text] command will record feedback.
+-The /newgame command will begin a new game.
+-The /startgame command will start a game, if there are at least 2 players.
+-The /listplayers command will list all players in the current game.
+-The /join [nickname] command will add the sender to the game under an optional name or their username as a default, if a game is pending.
+-The /leave command will remove the sender from the game, if a game is pending.
+-The /help command displays a list of these commands.
+-The /endgame command will end the current game, if it exists.
+-The /blame command will @ the current player's turn.
