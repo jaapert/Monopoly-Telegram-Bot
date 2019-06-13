@@ -583,7 +583,7 @@ if __name__ == "__main__":
         level=logging.INFO, filename='logging.txt', filemode='a')
 
     updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
-    updater.bot.set_webhook("https://monopoly-uno-bot.herokuapp.com/" + TOKEN)
+    updater.bot.set_webhook("https://la-monopoly-bot.herokuapp.com/" + TOKEN)
 
     #updater.start_polling()
     updater.idle()
