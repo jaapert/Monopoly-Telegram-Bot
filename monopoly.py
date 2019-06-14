@@ -259,7 +259,8 @@ class Game:
 
     def send_message(self, text):
         try:
-            bot.send_message(chat_id=self.chat_id, text=text)
+            print(text)
+            #bot.send_message(chat_id=self.chat_id, text=text)
         except TelegramError as e:
             raise e
 
@@ -369,6 +370,9 @@ class Game:
         self.last_roll = [-1]
         self.has_doubles = False
 
+        self.send_message(player.get_name() + " has ended their turn. The current player's turn is: " +
+                          self.players.get(self.turn).get_name())
+
     # I need to be careful about making sure the objects aren't copied.
     # I need the original objects to be passed around.
     def purchase_property(self, id):
@@ -392,6 +396,8 @@ class Game:
         property.set_owner(player)
         self.available_properties.remove(property)
         player.add_property(property)
+
+        print("You have purchased " + property.get_name() + " for $" + str(property_cost) + "!")
 
     def mortgage_property(self, id, property):
         player = self.players.get(id)

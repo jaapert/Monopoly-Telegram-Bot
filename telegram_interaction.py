@@ -328,7 +328,10 @@ def pay_handler(bot, update, chat_data, args):
     if not check_game_existence(chat_id, game):
         return
 
-    game.pay(user_id, int(args[0]), int(args[1]))
+    if args[0] == "bank":
+        game.pay(user_id, args[0], int(args[1]))
+    else:
+        game.pay(user_id, int(args[0]), int(args[1]))
 
 
 def get_out_of_jail_free_handler(bot, update, chat_data):
