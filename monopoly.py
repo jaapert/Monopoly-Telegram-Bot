@@ -378,7 +378,7 @@ class Game:
         self.has_doubles = False
 
         self.send_message(player.get_name() + " has ended their turn. The current player's turn is: " +
-                          self.players.get(self.turn).get_name())
+                          self.players.get(str(self.turn)).get_name())
 
     # I need to be careful about making sure the objects aren't copied.
     # I need the original objects to be passed around.
@@ -1022,8 +1022,8 @@ class Game:
 
 """
 if __name__ == "__main__":
-    players = {0 : "name", 1 : "name2"}
+    players = {"0" : "name", "1" : "name2"}
     game = Game("test", players)
-    game.roll_dice(0)
-    game.end_turn(0)
+    game.roll_dice("0")
+    game.end_turn("0")
 """

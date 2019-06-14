@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c461b1ad-79e5-4e69-b8e5-b80ce370e890" name="Default" comment="" />
+    <list default="true" id="c461b1ad-79e5-4e69-b8e5-b80ce370e890" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/monopoly.py" afterPath="$PROJECT_DIR$/monopoly.py" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -11,21 +13,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="monopoly.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="monopoly.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/monopoly.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="312">
-              <caret line="1028" column="3" lean-forward="false" selection-start-line="1028" selection-start-column="3" selection-end-line="1028" selection-end-column="3" />
+            <state relative-caret-position="143">
+              <caret line="266" column="13" lean-forward="false" selection-start-line="266" selection-start-column="13" selection-end-line="266" selection-end-column="13" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="telegram_interaction.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="telegram_interaction.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/telegram_interaction.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="317">
-              <caret line="527" column="60" lean-forward="true" selection-start-line="527" selection-start-column="60" selection-end-line="527" selection-end-column="60" />
+            <state relative-caret-position="220">
+              <caret line="215" column="0" lean-forward="true" selection-start-line="215" selection-start-column="0" selection-end-line="215" selection-end-column="0" />
               <folding>
                 <element signature="e#24#63#0" expanded="true" />
               </folding>
@@ -44,9 +46,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>add_hotel</find>
-      <find>get_property_by_id</find>
-      <find>color_count</find>
       <find>get_players</find>
       <find>buy</find>
       <find>if game is None</find>
@@ -64,7 +63,6 @@
       <find>purchase</find>
       <find>send_e</find>
       <find>.keys</find>
-      <find>print(text)</find>
       <find>end</find>
       <find>endgame</find>
       <find>def send_mess</find>
@@ -74,6 +72,10 @@
       <find>def pay</find>
       <find>self.pending_payments</find>
       <find>print(</find>
+      <find>print(text</find>
+      <find>self.players.get(self.turn)</find>
+      <find>print(text)</find>
+      <find>endgame_handler</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -214,9 +216,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="701" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1515625" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1515625" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3290938" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -538,21 +539,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/telegram_interaction.py">
+    <entry file="file://$PROJECT_DIR$/monopoly.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="317">
-          <caret line="527" column="60" lean-forward="true" selection-start-line="527" selection-start-column="60" selection-end-line="527" selection-end-column="60" />
-          <folding>
-            <element signature="e#24#63#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="143">
+          <caret line="266" column="13" lean-forward="false" selection-start-line="266" selection-start-column="13" selection-end-line="266" selection-end-column="13" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/monopoly.py">
+    <entry file="file://$PROJECT_DIR$/telegram_interaction.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="312">
-          <caret line="1028" column="3" lean-forward="false" selection-start-line="1028" selection-start-column="3" selection-end-line="1028" selection-end-column="3" />
-          <folding />
+        <state relative-caret-position="220">
+          <caret line="215" column="0" lean-forward="true" selection-start-line="215" selection-start-column="0" selection-end-line="215" selection-end-column="0" />
+          <folding>
+            <element signature="e#24#63#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
