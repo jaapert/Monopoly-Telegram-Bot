@@ -484,12 +484,13 @@ class Game:
         if prop < 0 or prop >= len(player.get_properties()):
             self.send_message("That is not a property you own.")
             return
-        
-        property = player.get_property_by_id(prop)
 
-        if property in current_props:
-            self.send_message("That property is already in the trade!")
-            return
+        if prop >= 0:
+            property = player.get_property_by_id(prop)
+
+            if property in current_props:
+                self.send_message("That property is already in the trade!")
+                return
 
         if cards + current_cards > player.get_out_free_cards():
             self.send_message("You do not have that many Get Out of Jail Free cards to trade!")
@@ -497,11 +498,11 @@ class Game:
 
         if player == self.pending_trade[0]:
             self.pending_trade[2] += money
-            self.pending_trade[4] += property
+            if prop >= 0: self.pending_trade[4] += property
             self.pending_trade[6] += cards
         elif player == self.pending_trade[1]:
             self.pending_trade[3] += money
-            self.pending_trade[5] += property
+            if prop >= 0: self.pending_trade[5] += property
             self.pending_trade[7] += cards
     
     def remove_from_trade(self, id, prop, money, cards):
@@ -528,24 +529,25 @@ class Game:
             current_props = self.pending_trade[5]
             current_cards = self.pending_trade[7]
 
-        if prop < 0 or prop >= len(player.get_properties()):
+        if prop >= len(player.get_properties()):
             self.send_message("That is not a property you own.")
             return
-        
-        property = player.get_property_by_id(prop)
 
-        if property not in current_props:
-            self.send_message("That property is not in the trade!")
-            return
+        if prop >= 0:
+            property = player.get_property_by_id(prop)
+
+            if property not in current_props:
+                self.send_message("That property is not in the trade!")
+                return
 
         # Money and cards when removed are thresholded to 0 if lower than 0.
         if player == self.pending_trade[0]:
             self.pending_trade[2] = 0 if current_money - money <= 0 else self.pending_trade[2] - money
-            self.pending_trade[4].remove(property)
+            if prop >= 0: self.pending_trade[4].remove(property)
             self.pending_trade[6] = 0 if current_cards - cards <= 0 else self.pending_trade[6] - cards
         elif player == self.pending_trade[1]:
             self.pending_trade[3] = 0 if current_money - money <= 0 else self.pending_trade[2] - money
-            self.pending_trade[5].remove(property)
+            if prop >= 0: self.pending_trade[5].remove(property)
             self.pending_trade[7] = 0 if current_cards - cards <= 0 else self.pending_trade[6] - cards
 
     def agree_to_trade(self, id):
