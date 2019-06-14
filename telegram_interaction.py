@@ -214,7 +214,7 @@ def endgame_handler(bot, update, chat_data):
     if not check_game_existence(chat_id, game):
         return
 
-    if user_id not in game.players_and_names:
+    if user_id not in game.get_players():
         text = open("static_responses/end_game_id_missing_failure.txt", "r").read()
         bot.send_message(chat_id=chat_id, text=text)
         return
