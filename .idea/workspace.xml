@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c461b1ad-79e5-4e69-b8e5-b80ce370e890" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/telegram_interaction.py" afterPath="$PROJECT_DIR$/telegram_interaction.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/monopoly.py" afterPath="$PROJECT_DIR$/monopoly.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -16,8 +16,8 @@
       <file leaf-file-name="monopoly.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/monopoly.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4722">
-              <caret line="500" column="29" lean-forward="false" selection-start-line="500" selection-start-column="29" selection-end-line="500" selection-end-column="29" />
+            <state relative-caret-position="143">
+              <caret line="261" column="12" lean-forward="false" selection-start-line="261" selection-start-column="12" selection-end-line="261" selection-end-column="12" />
               <folding />
             </state>
           </provider>
@@ -26,8 +26,8 @@
       <file leaf-file-name="telegram_interaction.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/telegram_interaction.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="186" column="17" lean-forward="false" selection-start-line="186" selection-start-column="17" selection-end-line="186" selection-end-column="17" />
+            <state relative-caret-position="267">
+              <caret line="588" column="5" lean-forward="false" selection-start-line="588" selection-start-column="5" selection-end-line="588" selection-end-column="5" />
               <folding>
                 <element signature="e#24#63#0" expanded="true" />
               </folding>
@@ -64,6 +64,7 @@
       <find>uno</find>
       <find>endgame</find>
       <find>startgame</find>
+      <find>print(te</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -76,10 +77,10 @@
         <option value="$PROJECT_DIR$/static_responses/rules.txt" />
         <option value="$PROJECT_DIR$/api_key.txt" />
         <option value="$PROJECT_DIR$/static_responses/start.txt" />
-        <option value="$PROJECT_DIR$/monopoly.py" />
         <option value="$PROJECT_DIR$/static_responses/start_game.txt" />
         <option value="$PROJECT_DIR$/static_responses/help.txt" />
         <option value="$PROJECT_DIR$/runtime.txt" />
+        <option value="$PROJECT_DIR$/monopoly.py" />
         <option value="$PROJECT_DIR$/telegram_interaction.py" />
       </list>
     </option>
@@ -140,7 +141,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.monopoly">
+  <component name="RunManager" selected="Python.telegram_interaction">
     <configuration name="monopoly" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -158,9 +159,31 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
+    <configuration name="telegram_interaction" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="MonopolyTelegramBot" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/telegram_interaction.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
+    <list size="2">
+      <item index="0" class="java.lang.String" itemvalue="Python.monopoly" />
+      <item index="1" class="java.lang.String" itemvalue="Python.telegram_interaction" />
+    </list>
     <recent_temporary>
-      <list size="1">
-        <item index="0" class="java.lang.String" itemvalue="Python.monopoly" />
+      <list size="2">
+        <item index="0" class="java.lang.String" itemvalue="Python.telegram_interaction" />
+        <item index="1" class="java.lang.String" itemvalue="Python.monopoly" />
       </list>
     </recent_temporary>
   </component>
@@ -512,16 +535,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/monopoly.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4722">
-          <caret line="500" column="29" lean-forward="false" selection-start-line="500" selection-start-column="29" selection-end-line="500" selection-end-column="29" />
+        <state relative-caret-position="143">
+          <caret line="261" column="12" lean-forward="false" selection-start-line="261" selection-start-column="12" selection-end-line="261" selection-end-column="12" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/telegram_interaction.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="186" column="17" lean-forward="false" selection-start-line="186" selection-start-column="17" selection-end-line="186" selection-end-column="17" />
+        <state relative-caret-position="267">
+          <caret line="588" column="5" lean-forward="false" selection-start-line="588" selection-start-column="5" selection-end-line="588" selection-end-column="5" />
           <folding>
             <element signature="e#24#63#0" expanded="true" />
           </folding>
