@@ -292,6 +292,7 @@ class Game:
         if player.get_money() >= 50:
             player.set_turns_left_in_jail(-1)
             player.add_money(-50)
+            self.send_message("You have paid your bail and escaped jail!")
             return
         
         if player.get_total_assets() >= 50:
@@ -314,6 +315,7 @@ class Game:
 
         player.set_turns_left_in_jail(-1)
         player.remove_out_free_card()
+        self.send_message("You have used a Get Out of Jail Free card to escape jail!")
 
     # This pay will be called using the pending pays list in the game.
     def pay(self, from_id, to_id, amount):
@@ -421,6 +423,7 @@ class Game:
 
         player.add_money(mortgage_value)
         property.set_mortgaged(True)
+        self.send_message("You have mortgaged " + property.get_name() + " for $" + str(mortgage_value) + "!")
 
     # This will work as follows:
     # The current turn player will propose a trade -- if one is not in progress.
@@ -442,6 +445,7 @@ class Game:
             return
 
         self.pending_trade = (player_1, player_2, 0, 0, [], [], 0, 0, False, False)
+        self.send_message("A trade is now pending between " + player_1.get_name() + " and " + player_2.get_name() + "!")
 
     def cancel_trade(self, id):
         player = self.players.get(id)
@@ -455,6 +459,7 @@ class Game:
             return
 
         self.pending_trade = None
+        self.send_message("The pending trade has been cancelled.")
 
     # Both players call this to add items to the trade. The agreement on what to add is
     # made in the chat.
@@ -509,7 +514,19 @@ class Game:
             self.pending_trade[3] += money
             if prop >= 0: self.pending_trade[5] += property
             self.pending_trade[7] += cards
-    
+
+        text = "The following is now in the trade. From " + self.pending_trade[0].get_name() + ":\n\n" + \
+                          "Money: $" + str(self.pending_trade[2]) + "\n" + "Get Out of Jail Free cards: " + \
+                          str(self.pending_trade[6]) + "\n" + "Properties:\n"
+        for p in self.pending_trade[4]:
+            text += p.get_name() + "\n"
+
+        text += "\nFrom " + self.pending_trade[1].get_name() + ":\n\n" + \
+                          "Money: $" + str(self.pending_trade[3]) + "\n" + "Get Out of Jail Free cards: " + \
+                          str(self.pending_trade[7]) + "\n" + "Properties:\n"
+        for p in self.pending_trade[5]:
+            text += p.get_name() + "\n"
+
     def remove_from_trade(self, id, prop, money, cards):
         player = self.players.get(id)
 
@@ -706,6 +723,7 @@ class Game:
 
         player.add_money(-property.get_house_cost())
         property.add_house()
+        self.send_message("You have added a house to " + property.get_name() + "!")
 
     def purchase_hotel(self, id, property_id):
         player = self.players.get(id)
@@ -733,6 +751,7 @@ class Game:
 
         player.add_money(-property.get_hotel_cost())
         property.add_hotel()
+        self.send_message("You have added a hotel to " + property.get_name() + "!")
 
     def chance_result(self, player):
         # Due to the difficulty of implementation, I've skipped implementing
