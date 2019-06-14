@@ -93,6 +93,9 @@ class Player:
     def set_turns_left_in_jail(self, turns):
         self.turns_left_in_jail = turns
 
+    def get_name(self):
+        return self.name
+
 
 class Property:
     # Note: rents is [base_rent, one_house_rent, ..., four_houses_rent, hotel_rent]
@@ -199,6 +202,7 @@ class Game:
         self.last_roll = [-1]
         # (player_1, player_2, money_from_1, money_from_2, props_from_1, props_from_2, cards_from_1, cards_from_2, agreed_1, agreed_2)
         self.pending_trade = None
+        self.ids = []
         self.board = \
         [
             "Go",
@@ -251,6 +255,7 @@ class Game:
         for user_id, name in players.items():
             self.send_message("(" + str(count) + ") " + name + " has been added to the game.\n")
             self.players[user_id] = Player(count, name, 1500)
+            self.ids += [count]
             count += 1
         self.send_message("The game of Monopoly has begun!")
 
@@ -358,7 +363,7 @@ class Game:
             self.send_message("You cannot end the turn! There are still pending payments to be made!")
             for p in self.pending_payments:
                 text = p[0].get_name() + " owes "
-                if p[1].get_name() is None:
+                if p[1] is None:
                     text += "the bank"
                 else:
                     text += p[1].get_name()
@@ -368,7 +373,7 @@ class Game:
         self.pending_trade = None
 
         if not self.has_doubles:
-            self.turn = (self.turn + 1) % len(self.players)
+            self.turn = self.ids[(self.ids.index(self.turn) + 1) % len(self.players)]
         self.last_roll = [-1]
         self.has_doubles = False
 
@@ -399,7 +404,7 @@ class Game:
         self.available_properties.remove(property)
         player.add_property(property)
 
-        print("You have purchased " + property.get_name() + " for $" + str(property_cost) + "!")
+        self.send_message("You have purchased " + property.get_name() + " for $" + str(property_cost) + "!")
 
     def mortgage_property(self, id, property):
         player = self.players.get(id)
@@ -775,7 +780,7 @@ class Game:
             player.add_money(50)
         elif card == 4:
             self.send_message("Chance Card: You got a Get Out of Jail Free card!")
-            player.add_out_of_free_card()
+            player.add_out_free_card()
         elif card == 5:
             self.send_message("Chance Card: Go back three spaces!")
             player.set_position((player.get_position() - 3) % len(self.board))
@@ -785,15 +790,14 @@ class Game:
             player.set_position(10)
             player.set_turns_in_jail(3)
         elif card == 7:
-            self.send_message("Chance Card: Make general repairs on all your property! \
-                               For each house pay $25, for each hotel pay $100!")
+            self.send_message("Chance Card: Make general repairs on all your property! For each house pay $25, for each hotel pay $100!")
             owed = 0
             for p in player.get_properties():
                 owed += p.get_houses() * 25 + p.get_hotels() * 100
-            self.pending_payments += (player, None, owed)
+            self.pending_payments.append((player, None, owed))
         elif card == 8:
             self.send_message("Chance Card: Pay poor tax of $15.")
-            self.pending_payments += (player, None, 15)
+            self.pending_payments.append((player, None, 15))
         elif card == 9:
             self.send_message("Chance Card: Take a trip to Reading Railroad!")
             player.set_position(5)
@@ -805,7 +809,7 @@ class Game:
         elif card == 11:
             self.send_message("Chance Card: You've been elected chairman of the board! Pay each player $50.")
             for id in self.players.keys():
-                self.pending_payments += (player, self.players[id], 50)
+                self.pending_payments.append((player, self.players[id], 50))
         elif card == 12:
             self.send_message("Chance Card: Your building loan matures! Recieve $150.")
             player.add_money(150)
@@ -821,7 +825,7 @@ class Game:
             player.add_money(200)
         elif card == 2:
             self.send_message("Community Chest Card: Doctor's fees! Pay $50.")
-            self.pending_payments += (player, None, 50)
+            self.pending_payments.append((player, None, 50))
         elif card == 3:
             self.send_message("Community Chest Card: From stock sale you get $50!")
             player.add_money(50)
@@ -841,23 +845,22 @@ class Game:
         elif card == 8:
             self.send_message("Community Chest Card: It's your birthday! Collect $10 from each player.")
             for id in self.players.keys():
-                self.pending_payments += (self.players[id], player, 10)
+                self.pending_payments.appned((self.players[id], player, 10))
         elif card == 9:
             self.send_message("Community Chest Card: Life insurance matures. Collect $100!")
             player.add_money(100)
         elif card == 10:
             self.send_message("Community Chest Card: School fees! Pay $50.")
-            self.pending_payments += (player, None, 50)
+            self.pending_payments.append((player, None, 50))
         elif card == 11:
             self.send_message("Community Chest Card: Receive $25 consultancy fee!")
             player.add_money(25)
         elif card == 12:
-            self.send_message("Community Chest Card: You are assessed for street repairs: \
-                               Pay $40 per house and $115 per hotel you own.")
+            self.send_message("Community Chest Card: You are assessed for street repairs: Pay $40 per house and $115 per hotel you own.")
             owed = 0
             for p in player.get_properties():
                 owed += p.get_houses() * 40 + p.get_hotels() * 115
-            self.pending_payments += (player, None, owed)
+            self.pending_payments.append((player, None, owed))
         elif card == 13:
             self.send_message("Community Chest Card: You won second place in a beauty contest. Receive $10!")
             player.add_money(10)
@@ -887,8 +890,7 @@ class Game:
             return
         
         if self.board[position] == "Jail" and player.get_turns_left_in_jail() != -1:
-            self.send_message("You are currently in jail! Escape by rolling doubles, a Get Out of Jail Free card, \
-                               or paying your $50 bail.")
+            self.send_message("You are currently in jail! Escape by rolling doubles, a Get Out of Jail Free card, or paying your $50 bail.")
             return
 
         if self.board[position] == "Jail" and player.get_turns_left_in_jail() == -1:
@@ -905,12 +907,12 @@ class Game:
 
         if self.board[position] == "Luxury Tax":
             self.send_message("You landed on Luxury Tax! Pay $100.")
-            self.pending_payments += (player, None, 100)
+            self.pending_payments.append((player, None, 100))
             return
 
         if self.board[position] == "Income Tax":
             self.send_message("You landed on Luxury Tax! Pay $200.")
-            self.pending_payments += (player, None, 200)
+            self.pending_payments.append((player, None, 200))
             return
 
         if type(self.board[position]) == Property:
@@ -926,7 +928,7 @@ class Game:
                     owner = property.get_owner()
                     rent = property.get_rent_cost()
                     self.send_message("You owe " + owner.get_name() + " $" + str(rent) + ".")
-                    self.pending_payments += (player, owner, rent)
+                    self.pending_payments.append((player, owner, rent))
                 else:
                     self.send_message("You own this property!")
         
@@ -948,7 +950,7 @@ class Game:
                             if type(p) == OtherProperty and p.get_type() == "Railroad":
                                 num_railroads += 1
                         self.send_message("You owe " + owner.get_name() + " $" + str(rent * num_railroads) + ".")
-                        self.pending_payments += (player, owner, rent * num_railroads)
+                        self.pending_payments.append((player, owner, rent * num_railroads))
                     elif property.get_type() == "Utility":
                         num_utils = 0
                         for p in owner.get_properties():
@@ -956,7 +958,7 @@ class Game:
                                 num_utils += 1
                         rent = 10 * sum(self.last_roll) if num_utils == 2 else 4 * sum(self.last_roll)
                         self.send_message("You owe " + owner.get_name() + " $" + str(rent) + ".")
-                        self.pending_payments += (player, owner, rent)
+                        self.pending_payments.append((player, owner, rent))
                     else:
                         self.send_message("This is not a valid property type!")
                 else:
@@ -980,6 +982,7 @@ class Game:
                               player_1.get_out_free_cards(), 0, True, True)
         self.trade()
         del self.players[id_1]
+        self.ids.remove(id_1)
         self.turn = self.turn % len(self.players)
 
     def roll_dice(self, id):
@@ -1016,3 +1019,9 @@ class Game:
             self.last_roll = roll
             player.set_position((player.get_position() + sum(roll)) % len(self.board))
             self.enact_roll_result(player)
+
+if __name__ == "__main__":
+    players = {0 : "name", 1 : "name2"}
+    game = Game("test", players)
+    game.roll_dice(0)
+    game.end_turn(0)
