@@ -1025,5 +1025,6 @@ if __name__ == "__main__":
     players = {"0" : "name", "1" : "name2"}
     game = Game("test", players)
     game.roll_dice("0")
+    game.purchase_property("0")
     game.end_turn("0")
 """
