@@ -43,7 +43,7 @@ def send_info(bot, chat_id, game, user_id):
     player = game.players.get(user_id)
     props = player.get_properties_str()
     money = player.get_money()
-    cards = player.get_out_free_cards()
+    cards = player.get_get_out_free_cards()
     bot.send_message(chat_id=user_id,
                      text=props + "\n\nYour money: $" + str(money) + "\n\n" + "Your cards: " + str(cards))
 

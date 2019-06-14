@@ -48,7 +48,7 @@ class Player:
     def get_id(self):
         return self.id
 
-    def get_out_free_cards(self):
+    def get_get_out_free_cards(self):
         return self.get_out_free_cards
 
     def add_money(self, money):
@@ -314,7 +314,7 @@ class Game:
             self.send_message("You are not currently in jail!")
             return
 
-        if player.get_out_free_cards() <= 0:
+        if player.get_get_out_free_cards() <= 0:
             self.send_message("You don't have any Get Out of Jail Free cards!")
             return
 
@@ -507,7 +507,7 @@ class Game:
                 self.send_message("That property is already in the trade!")
                 return
 
-        if cards + current_cards > player.get_out_free_cards():
+        if cards + current_cards > player.get_get_out_free_cards():
             self.send_message("You do not have that many Get Out of Jail Free cards to trade!")
             return
 
@@ -656,7 +656,7 @@ class Game:
             self.send_message("You cannot trade properties you do not have!")
             return
 
-        if cards_from_1 > player_1.get_out_free_cards() or cards_from_2 > player_2.get_out_free_cards():
+        if cards_from_1 > player_1.get_get_out_free_cards() or cards_from_2 > player_2.get_get_out_free_cards():
             self.send_message("You cannot trade more Get Out of Jail free cards than you have!")
             return
 
@@ -979,7 +979,7 @@ class Game:
 
         self.send_message(player_1.get_name() + " has bankrupted to " + player_2.get_name() + "!")
         self.pending_trade = (player_1, player_2, player_1.get_money(), 0, player_1.get_properties(), [],
-                              player_1.get_out_free_cards(), 0, True, True)
+                              player_1.get_get_out_free_cards(), 0, True, True)
         self.trade()
         del self.players[id_1]
         self.ids.remove(id_1)
