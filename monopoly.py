@@ -17,7 +17,7 @@ class Dice:
         self.sides = sides
 
     def roll(self):
-        return [random.randint(1, self.sides + 1) for _ in range(self.dice_count)]
+        return [random.randint(1, self.sides) for _ in range(self.dice_count)]
 
     def check_doubles(self, roll):
         if len(roll) == 2:
@@ -196,7 +196,7 @@ class Game:
         self.has_doubles = False
         # Make pending payments a list of tuples in the form (from, to, amount)
         self.pending_payments = []
-        self.last_roll = -1
+        self.last_roll = [-1]
         # (player_1, player_2, money_from_1, money_from_2, props_from_1, props_from_2, cards_from_1, cards_from_2, agreed_1, agreed_2)
         self.pending_trade = None
         self.board = \
@@ -244,7 +244,7 @@ class Game:
         ]
         # Somewhat ugly, but I need the reference to the object not a copy.
         self.available_properties = list(filter(lambda x: x is not None,
-                                           [p if p is Property or OtherProperty else None for p in self.board]))
+                                           [p if type(p) == Property or type(p) == OtherProperty else None for p in self.board]))
 
         count = 0
         # Maybe randomize for fairness? It matters a bit in Monopoly.
@@ -259,7 +259,8 @@ class Game:
 
     def send_message(self, text):
         try:
-            bot.send_message(chat_id=self.chat_id, text=text)
+            print(text)
+            #bot.send_message(chat_id=self.chat_id, text=text)
         except TelegramError as e:
             raise e
 
@@ -366,7 +367,7 @@ class Game:
 
         if not self.has_doubles:
             self.turn = (self.turn + 1) % len(self.players)
-        self.last_roll = -1
+        self.last_roll = [-1]
         self.has_doubles = False
 
     # I need to be careful about making sure the objects aren't copied.
@@ -655,7 +656,7 @@ class Game:
             self.send_message("You cannot buy a house on a property that isn't yours!")
             return
 
-        if property is OtherProperty:
+        if type(property) == OtherProperty:
             self.send_message("You cannot buy houses on a Railroad or Utility!")
             return
         
@@ -666,7 +667,7 @@ class Game:
         color_count = 0
         prop_color = property.get_color()
         for p in player.get_properties():
-            if p is Property and p.get_color() == prop_color:
+            if type(p) == Property and p.get_color() == prop_color:
                 color_count += 1
 
         if color_count < 2 and (prop_color == "Dark Blue" or prop_color == "Brown"):
@@ -843,12 +844,12 @@ class Game:
             self.send_message("You landed on Free Parking!")
             return
         
-        if self.board[position] == "Jail" and player.get_turns_left_in_jail != -1:
+        if self.board[position] == "Jail" and player.get_turns_left_in_jail() != -1:
             self.send_message("You are currently in jail! Escape by rolling doubles, a Get Out of Jail Free card, \
                                or paying your $50 bail.")
             return
 
-        if self.board[position] == "Jail" and player.get_turns_left_in_jail == -1:
+        if self.board[position] == "Jail" and player.get_turns_left_in_jail() == -1:
             self.send_message("You are currently visiting jail.")
             return
 
@@ -861,20 +862,22 @@ class Game:
             return
 
         if self.board[position] == "Luxury Tax":
+            self.send_message("You landed on Luxury Tax! Pay $100.")
             self.pending_payments += (player, None, 100)
             return
 
         if self.board[position] == "Income Tax":
+            self.send_message("You landed on Luxury Tax! Pay $200.")
             self.pending_payments += (player, None, 200)
             return
-        
-        if self.board[position] is Property:
+
+        if type(self.board[position]) == Property:
             property = self.board[position]
             self.send_message("You landed on " + property.get_name() + "!")
 
             if property in self.available_properties:
                 self.send_message("This property is available! You can buy " + \
-                                  str(property.get_name()) + " for " + str(property.get_cost()) + ".")
+                                  str(property.get_name()) + " for $" + str(property.get_cost()) + ".")
                 return
             else:
                 if property not in player.get_properties():
@@ -885,13 +888,13 @@ class Game:
                 else:
                     self.send_message("You own this property!")
         
-        if self.board[position] is OtherProperty:
+        if type(self.board[position]) == OtherProperty:
             property = self.board[position]
             self.send_message("You landed on " + property.get_name() + "!")
 
             if property in self.available_properties:
                 self.send_message("This property is available! You can buy " + \
-                                  str(property.get_name()) + " for " + str(property.get_cost()) + ".")
+                                  str(property.get_name()) + " for $" + str(property.get_cost()) + ".")
                 return
             else:
                 if property not in player.get_properties():
@@ -900,14 +903,14 @@ class Game:
                     if property.get_type() == "Railroad":
                         num_railroads = 0
                         for p in owner.get_properties():
-                            if p is OtherProperty and p.get_type() == "Railroad":
+                            if type(p) == OtherProperty and p.get_type() == "Railroad":
                                 num_railroads += 1
                         self.send_message("You owe " + owner.get_name() + " $" + str(rent * num_railroads) + ".")
                         self.pending_payments += (player, owner, rent * num_railroads)
                     elif property.get_type() == "Utility":
                         num_utils = 0
                         for p in owner.get_properties():
-                            if p is OtherProperty and p.get_type() == "Utility":
+                            if type(p) == OtherProperty and p.get_type() == "Utility":
                                 num_utils += 1
                         rent = 10 * sum(self.last_roll) if num_utils == 2 else 4 * sum(self.last_roll)
                         self.send_message("You owe " + owner.get_name() + " $" + str(rent) + ".")
@@ -916,7 +919,7 @@ class Game:
                         self.send_message("This is not a valid property type!")
                 else:
                     self.send_message("You own this property!")
-                            
+
     def bankrupt(self, id_1, id_2):
         # Player 1 bankrupts to Player 2.
         player_1 = self.players.get(id_1)
@@ -943,7 +946,7 @@ class Game:
         if not self.check_player_existence_and_turn(player):
             return
 
-        if self.last_roll != -1:
+        if sum(self.last_roll) != -1:
             self.send_message("You already rolled this turn!")
             return
         
@@ -953,16 +956,17 @@ class Game:
         text = "You rolled a ["
         for n in roll:
             text += str(n) + ","
+        text = text[:-1]
         text += "]!"
 
         self.send_message(text)
 
-        if player.get_turns_left_in_jail > 0 and self.has_doubles:
+        if player.get_turns_left_in_jail() > 0 and self.has_doubles:
             player.set_turns_left_in_jail(-1)
-            self.last_roll = -1
+            self.last_roll = [-1]
 
             self.send_message("You escaped jail!")
-        elif player.get_turns_left_in_jail > 0 and not self.has_doubles:
+        elif player.get_turns_left_in_jail() > 0 and not self.has_doubles:
             player.set_turns_left_in_jail(player.get_turns_left_in_jail() - 1)
             self.send_message("You did not escape jail! You can wait, pay $50 bail, or use a Get Out of Jail Free card.")
             self.last_roll = roll
