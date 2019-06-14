@@ -259,8 +259,8 @@ class Game:
 
     def send_message(self, text):
         try:
-            print(text)
-            #bot.send_message(chat_id=self.chat_id, text=text)
+            #print(text)
+            bot.send_message(chat_id=self.chat_id, text=text)
         except TelegramError as e:
             raise e
 
