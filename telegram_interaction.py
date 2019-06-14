@@ -38,6 +38,7 @@ def check_game_existence(chat_id, game):
         return False
     return True
 
+
 def send_info(bot, chat_id, game, user_id):
     player = game.players.get(user_id)
     props = player.get_properties_str()
@@ -180,10 +181,10 @@ def startgame_handler(bot, update, chat_data):
         bot.send_message(chat_id=chat_id, text=text)
         return
 
-    if len(pending_players) < MIN_PLAYERS:
+    """if len(pending_players) < MIN_PLAYERS:
         text = open("static_responses/start_game_min_threshold.txt", "r").read()
         bot.send_message(chat_id=chat_id, text=text)
-        return
+        return"""
 
     try:
         for user_id, nickname in pending_players.items():
