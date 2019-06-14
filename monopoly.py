@@ -1020,8 +1020,10 @@ class Game:
             player.set_position((player.get_position() + sum(roll)) % len(self.board))
             self.enact_roll_result(player)
 
+"""
 if __name__ == "__main__":
     players = {0 : "name", 1 : "name2"}
     game = Game("test", players)
     game.roll_dice(0)
     game.end_turn(0)
+"""
