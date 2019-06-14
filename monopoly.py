@@ -555,6 +555,18 @@ class Game:
             if prop >= 0: self.pending_trade[5].remove(property)
             self.pending_trade[7] = 0 if current_cards - cards <= 0 else self.pending_trade[6] - cards
 
+        text = "The following is now in the trade. From " + self.pending_trade[0].get_name() + ":\n\n" + \
+                          "Money: $" + str(self.pending_trade[2]) + "\n" + "Get Out of Jail Free cards: " + \
+                          str(self.pending_trade[6]) + "\n" + "Properties:\n"
+        for p in self.pending_trade[4]:
+            text += p.get_name() + "\n"
+
+        text += "\nFrom " + self.pending_trade[1].get_name() + ":\n\n" + \
+                          "Money: $" + str(self.pending_trade[3]) + "\n" + "Get Out of Jail Free cards: " + \
+                          str(self.pending_trade[7]) + "\n" + "Properties:\n"
+        for p in self.pending_trade[5]:
+            text += p.get_name() + "\n"
+
     def agree_to_trade(self, id):
         player = self.players.get(id)
 
@@ -571,6 +583,8 @@ class Game:
         elif player == self.pending_trade[1]:
             self.pending_trade[9] = True
 
+        self.send_message(player.get_name() + " has agreed to the trade!")
+
     def disagree_to_trade(self, id):
         player = self.players.get(id)
 
@@ -586,6 +600,8 @@ class Game:
             self.pending_trade[8] = False
         elif player == self.pending_trade[1]:
             self.pending_trade[9] = False
+
+        self.send_message(player.get_name() + " has disagreed to the trade!")
 
     def trade(self):
         if self.pending_trade is None:
