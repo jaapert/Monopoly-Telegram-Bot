@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 import telegram
-from telegram.error import Unauthorized, TelegramError
+from telegram.error import TelegramError
 
 import random
 
@@ -27,7 +27,7 @@ class Dice:
 
 
 class Player:
-    def __init__(self, id, name, money):
+    def __init__(self, user_id, id, name, money):
         self.properties = []
         self.money = money
         self.get_out_free_cards = 0
@@ -35,6 +35,8 @@ class Player:
         self.id = id
         self.name = name
         self.position = 0
+        self.user_id = user_id
+        self.total_roll = 0
 
     def get_properties(self):
         return self.properties
@@ -47,6 +49,9 @@ class Player:
 
     def get_id(self):
         return self.id
+
+    def get_user_id(self):
+        return self.user_id
 
     def get_get_out_free_cards(self):
         return self.get_out_free_cards
@@ -63,6 +68,10 @@ class Player:
     def add_property(self, property):
         self.properties.append(property)
 
+    def remove_property(self, property):
+        if property in self.properties:
+            self.properties.remove(property)
+
     def get_property_by_id(self, id):
         count = 0
         for p in self.properties:
@@ -75,26 +84,47 @@ class Player:
         text = "Your properties:\n\n"
         count = 0
         for p in self.properties:
-            text += "(" + str(count) + ") " + p.name + "\n"
+            if type(p) == Property:
+                text += "(" + str(count) + ") " + p.get_name() + " : " + p.get_color() + \
+                        " (" + str(p.get_houses()) + " houses, " + str(p.get_hotels()) + " hotels)" + \
+                        " [Mortgage Value: " + p.get_mortgage_value() + "] " + \
+                        ("[[Mortgaged]]\n" if p.get_mortgaged() else "\n")
+            elif type(p) == OtherProperty:
+                text += "(" + str(count) + ") " + p.get_name() + " : " + p.get_type() + "\n" + \
+                        " [Mortgage Value: " + p.get_mortgage_value() + "] " + \
+                        ("[[Mortgaged]]" if p.get_mortgaged() else "")
             count += 1
         return text
 
     def get_position(self):
         return self.position
-    
+
     def set_position(self, position):
         self.position = position
 
     def get_total_assets(self):
-        return self.money + sum([p.mortgage_value + 
-                                 p.house_cost * p.houses + 
-                                 p.hotel_cost * p.hotels for p in self.properties])
+        total = self.money
+        for p in self.properties:
+            if type(p) == Property:
+                total += p.mortgage_value + p.house_cost * p.houses + p.hotel_cost * p.hotels
+            elif type(p) == OtherProperty:
+                total += p.mortgage_value
+        return total
 
     def set_turns_left_in_jail(self, turns):
         self.turns_left_in_jail = turns
 
     def get_name(self):
         return self.name
+
+    def get_total_roll(self):
+        return self.total_roll
+
+    def add_to_total_roll(self, roll_sum):
+        self.total_roll += roll_sum
+
+    def sort_props_by_color(self):
+        self.properties.sort(key=lambda p: p.get_color())
 
 
 class Property:
@@ -116,10 +146,19 @@ class Property:
         if self.houses < 4 and self.hotels == 0:
             self.houses += 1
 
+    def sell_house(self):
+        if self.houses > 0:
+            self.houses -= 1
+
     def add_hotel(self):
         if self.houses == 4:
             self.houses = 0
             self.hotels = 1
+
+    def sell_hotel(self):
+        if self.hotels > 0:
+            self.hotels = 0
+            self.houses = 4
 
     def get_name(self):
         return self.name
@@ -138,10 +177,10 @@ class Property:
 
     def get_house_cost(self):
         return self.house_cost
-    
-    def hotel_cost(self):
+
+    def get_hotel_cost(self):
         return self.hotel_cost
-    
+
     def get_cost(self):
         return self.cost
 
@@ -154,9 +193,12 @@ class Property:
 
     def get_owner(self):
         return self.owner
-    
+
     def set_owner(self, player):
         self.owner = player
+
+    def get_mortgage_value(self):
+        return self.mortgage_value
 
 
 class OtherProperty:
@@ -165,6 +207,7 @@ class OtherProperty:
         self.cost = cost
         self.rent = rent
         self.mortgage_value = mortgage_value
+        self.mortgaged = False
         self.type = type
         self.owner = None
 
@@ -185,9 +228,16 @@ class OtherProperty:
 
     def get_owner(self):
         return self.owner
-    
+
     def set_owner(self, player):
         self.owner = player
+
+    def get_mortgaged(self):
+        return self.mortgaged
+
+    def set_mortgaged(self, val):
+        # I'll assume for the moment that it's a bool; I need to add a check for that.
+        self.mortgaged = val
 
 
 class Game:
@@ -254,13 +304,16 @@ class Game:
         # Maybe randomize for fairness? It matters a bit in Monopoly.
         for user_id, name in players.items():
             self.send_message("(" + str(count) + ") " + name + " has been added to the game.\n")
-            self.players[user_id] = Player(count, name, 1500)
+            self.players[user_id] = Player(user_id, count, name, 1500)
             self.ids += [count]
             count += 1
         self.send_message("The game of Monopoly has begun!")
 
     def get_players(self):
         return self.players
+
+    def get_pending_payments(self):
+        return self.pending_payments
 
     def send_message(self, text):
         try:
@@ -280,6 +333,17 @@ class Game:
 
         return True
 
+    def check_pass_go(self, text, last_total_roll, current_total_roll, player):
+        if last_total_roll // len(self.board) < current_total_roll // len(self.board):
+            self.send_message("You " + text + " Go and collected $200!")
+            player.add_money(200)
+
+    def get_player_by_local_id(self, id):
+        for p in self.players.values():
+            if p.get_id() == id:
+                return p
+        return None
+
     def pay_bail(self, id):
         player = self.players.get(id)
 
@@ -290,16 +354,20 @@ class Game:
             self.send_message("You are not currently in jail!")
             return
 
+        if player.get_money() < 50:
+            self.send_message("You don't have enough in money to pay your $50 bail!")
+            return
+
         if player.get_total_assets() < 50:
-            self.send_message("You don't have enough in total assets to pay your bail!")
+            self.send_message("You don't even have enough in total assets to pay your $50 bail!")
             return
 
         if player.get_money() >= 50:
             player.set_turns_left_in_jail(-1)
             player.add_money(-50)
-            self.send_message("You have paid your bail and escaped jail!")
+            self.send_message("You have paid your $50 bail and escaped jail!")
             return
-        
+
         if player.get_total_assets() >= 50:
             self.send_message("You have enough in total assets to pay your bail, \
                               but you need to sell some houses or mortgage some properties.")
@@ -325,7 +393,11 @@ class Game:
     # This pay will be called using the pending pays list in the game.
     def pay(self, from_id, to_id, amount):
         payer = self.players.get(from_id)
-        payee = None if to_id is None or "bank" else self.players.get(to_id)
+        if to_id is None or to_id == "bank":
+            payee = None
+        else:
+            payee = self.get_player_by_local_id(to_id)
+
         if (payer, payee, amount) not in self.pending_payments:
             self.send_message("That transaction is not a pending payment!")
             return
@@ -358,7 +430,11 @@ class Game:
 
         if not self.check_player_existence_and_turn(player):
             return
-        
+
+        if sum(self.last_roll) == -1:
+            self.send_message("You must roll the dice before ending your turn!")
+            return
+
         if len(self.pending_payments) > 0:
             self.send_message("You cannot end the turn! There are still pending payments to be made!")
             for p in self.pending_payments:
@@ -377,8 +453,9 @@ class Game:
         self.last_roll = [-1]
         self.has_doubles = False
 
-        self.send_message(player.get_name() + " has ended their turn. The current player's turn is: " +
-                          self.players.get(str(self.turn)).get_name())
+        #self.send_message(player.get_name() + " has ended their turn.")
+        self.send_message(player.get_name() + " has ended their turn. The current player's turn is: " + \
+                          self.get_player_by_local_id(self.turn).get_name())
 
     # I need to be careful about making sure the objects aren't copied.
     # I need the original objects to be passed around.
@@ -396,18 +473,20 @@ class Game:
         property_cost = property.get_cost()
 
         if player.get_money() < property_cost:
-            self.send_message("You do not have enough money to buy this property (" + str(property_cost) + ")!")
+            self.send_message("You do not have enough money to buy this property!")
             return
 
         player.add_money(-property_cost)
         property.set_owner(player)
         self.available_properties.remove(property)
         player.add_property(property)
+        player.sort_props_by_color()
 
         self.send_message("You have purchased " + property.get_name() + " for $" + str(property_cost) + "!")
 
-    def mortgage_property(self, id, property):
+    def mortgage_property(self, id, prop_id):
         player = self.players.get(id)
+        property = player.get_property_by_id(prop_id)
 
         if not self.check_player_existence_and_turn(player):
             return
@@ -416,19 +495,50 @@ class Game:
             self.send_message("You cannot mortgage a property that isn't yours!")
             return
 
-        if property.mortgaged():
+        if property.get_mortgaged():
             self.send_message("You cannot mortgage a property that's already mortgaged!")
             return
 
         # I'm going to have mortgage property autosell the houses and hotels on the property.
 
         mortgage_value = property.get_mortgage_value()
-        mortgage_value += property.get_houses() * property.get_house_cost()
-        mortgage_value += property.get_hotels() * property.get_hotel_cost()
+        if type(property) == Property:
+            mortgage_value += property.get_houses() * property.get_house_cost()
+            mortgage_value += property.get_hotels() * property.get_hotel_cost()
 
         player.add_money(mortgage_value)
         property.set_mortgaged(True)
         self.send_message("You have mortgaged " + property.get_name() + " for $" + str(mortgage_value) + "!")
+
+
+    def unmortgage_property(self, id, prop_id):
+        player = self.players.get(id)
+        property = player.get_property_by_id(prop_id)
+
+        if not self.check_player_existence_and_turn(player):
+            return
+
+        if property not in player.get_properties():
+            self.send_message("You cannot mortgage a property that isn't yours!")
+            return
+
+        if not property.get_mortgaged():
+            self.send_message("You cannot unmortgage a property that isn't mortgaged!")
+            return
+
+        unmortgage_cost = property.get_mortgage_value()
+
+        if player.get_money() < unmortgage_cost:
+            self.send_message("You don't have enough in money to unmortgage that property!")
+            return
+
+        if player.get_total_assets() < unmortgage_cost:
+            self.send_message("You don't even have enough in total assets to unmortgage that property!")
+            return
+
+        player.add_money(-unmortgage_cost)
+        property.set_mortgaged(False)
+        self.send_message("You have unmortgaged " + property.get_name() + " for $" + str(unmortgage_cost) + "!")
 
     # This will work as follows:
     # The current turn player will propose a trade -- if one is not in progress.
@@ -440,7 +550,7 @@ class Game:
     # Once both players agree to the trade, it will go through.
     def setup_trade(self, id_1, id_2):
         player_1 = self.players.get(id_1)
-        player_2 = self.players.get(id_2)
+        player_2 = self.get_player_by_local_id(id_2)
 
         if not self.check_player_existence_and_turn(player_1):
             return
@@ -449,7 +559,7 @@ class Game:
             self.send_message("The second trader doesn't seem to exist!")
             return
 
-        self.pending_trade = (player_1, player_2, 0, 0, [], [], 0, 0, False, False)
+        self.pending_trade = [player_1, player_2, 0, 0, [], [], 0, 0, False, False]
         self.send_message("A trade is now pending between " + player_1.get_name() + " and " + player_2.get_name() + "!")
 
     def cancel_trade(self, id):
@@ -458,7 +568,7 @@ class Game:
         if self.pending_trade is None:
             self.send_message("There is no pending trade!")
             return
-        
+
         if player not in self.pending_trade:
             self.send_message("You are not in this trade and therefore cannot cancel it.")
             return
@@ -474,13 +584,21 @@ class Game:
         if self.pending_trade is None:
             self.send_message("There is no pending trade!")
             return
-        
+
         if player not in self.pending_trade:
             self.send_message("You are not in this trade and therefore cannot change its terms.")
             return
 
         if self.pending_trade[8] or self.pending_trade[9]:
             self.send_message("At least one person has agreed to the current trade. You cannot change its terms.")
+            return
+
+        if money < 0:
+            self.send_message("You cannot trade negative money.")
+            return
+
+        if cards < 0:
+            self.send_message("You cannot trade negative quantities of cards.")
             return
 
         if player == self.pending_trade[0]:
@@ -496,7 +614,7 @@ class Game:
             self.send_message("You cannot trade more money than you have!")
             return
 
-        if prop < 0 or prop >= len(player.get_properties()):
+        if prop >= len(player.get_properties()):
             self.send_message("That is not a property you own.")
             return
 
@@ -513,14 +631,14 @@ class Game:
 
         if player == self.pending_trade[0]:
             self.pending_trade[2] += money
-            if prop >= 0: self.pending_trade[4] += property
+            if prop >= 0: self.pending_trade[4].append(property)
             self.pending_trade[6] += cards
         elif player == self.pending_trade[1]:
             self.pending_trade[3] += money
-            if prop >= 0: self.pending_trade[5] += property
+            if prop >= 0: self.pending_trade[5].append(property)
             self.pending_trade[7] += cards
 
-        text = "The following is now in the trade. From " + self.pending_trade[0].get_name() + ":\n\n" + \
+        text = "The following is now in the trade. \n\n From " + self.pending_trade[0].get_name() + ":\n\n" + \
                           "Money: $" + str(self.pending_trade[2]) + "\n" + "Get Out of Jail Free cards: " + \
                           str(self.pending_trade[6]) + "\n" + "Properties:\n"
         for p in self.pending_trade[4]:
@@ -531,6 +649,7 @@ class Game:
                           str(self.pending_trade[7]) + "\n" + "Properties:\n"
         for p in self.pending_trade[5]:
             text += p.get_name() + "\n"
+        self.send_message(text)
 
     def remove_from_trade(self, id, prop, money, cards):
         player = self.players.get(id)
@@ -538,7 +657,7 @@ class Game:
         if self.pending_trade is None:
             self.send_message("There is no pending trade!")
             return
-        
+
         if player not in self.pending_trade:
             self.send_message("You are not in this trade and therefore cannot change its terms.")
             return
@@ -577,7 +696,7 @@ class Game:
             if prop >= 0: self.pending_trade[5].remove(property)
             self.pending_trade[7] = 0 if current_cards - cards <= 0 else self.pending_trade[6] - cards
 
-        text = "The following is now in the trade. From " + self.pending_trade[0].get_name() + ":\n\n" + \
+        text = "The following is now in the trade. \n\n From " + self.pending_trade[0].get_name() + ":\n\n" + \
                           "Money: $" + str(self.pending_trade[2]) + "\n" + "Get Out of Jail Free cards: " + \
                           str(self.pending_trade[6]) + "\n" + "Properties:\n"
         for p in self.pending_trade[4]:
@@ -588,6 +707,7 @@ class Game:
                           str(self.pending_trade[7]) + "\n" + "Properties:\n"
         for p in self.pending_trade[5]:
             text += p.get_name() + "\n"
+        self.send_message(text)
 
     def agree_to_trade(self, id):
         player = self.players.get(id)
@@ -595,7 +715,7 @@ class Game:
         if self.pending_trade is None:
             self.send_message("There is no pending trade!")
             return
-        
+
         if player not in self.pending_trade:
             self.send_message("You are not in this trade and therefore cannot agree to have it.")
             return
@@ -613,7 +733,7 @@ class Game:
         if self.pending_trade is None:
             self.send_message("There is no pending trade!")
             return
-        
+
         if player not in self.pending_trade:
             self.send_message("You are not in this trade and therefore cannot agree to have it.")
             return
@@ -625,7 +745,7 @@ class Game:
 
         self.send_message(player.get_name() + " has disagreed to the trade!")
 
-    def trade(self):
+    def trade(self, bankrupt=False):
         if self.pending_trade is None:
             self.send_message("There is no pending trade!")
             return
@@ -660,30 +780,41 @@ class Game:
             self.send_message("You cannot trade more Get Out of Jail free cards than you have!")
             return
 
-        player_1.add_money(-money_from_1)
-        player_1.add_money(money_from_2)
-        self.send_message(player_2.get_name() + " has traded $" + str(money_from_2) + " to " + player_1.get_name() + "!")
+        if not bankrupt:
+            player_1.add_money(-money_from_1)
+            player_1.add_money(money_from_2)
+            self.send_message(player_2.get_name() + " has traded $" + str(money_from_2) + " to " + player_1.get_name() + "!")
         player_2.add_money(-money_from_2)
         player_2.add_money(money_from_1)
         self.send_message(player_1.get_name() + " has traded $" + str(money_from_1) + " to " + player_2.get_name() + "!")
-        
-        for p in props_from_2:
-            p.set_owner(player_1)
-            player_1.add_property(p)
-            self.send_message(player_2.get_name() + " has traded " + p.get_name() + " to " + player_1.get_name() + "!")
+
+        if not bankrupt:
+            for p in props_from_2:
+                player_2.remove_property(p)
+                p.set_owner(player_1)
+                player_1.add_property(p)
+                self.send_message(player_2.get_name() + " has traded " + p.get_name() + " to " + player_1.get_name() + "!")
         for p in props_from_1:
+            player_1.remove_property(p)
             p.set_owner(player_2)
             player_2.add_property(p)
             self.send_message(player_1.get_name() + " has traded " + p.get_name() + " to " + player_2.get_name() + "!")
 
-        for i in range(cards_from_2):
-            player_1.add_get_out_free_card()
+        if not bankrupt:
+            for i in range(cards_from_2):
+                player_1.add_get_out_free_card()
         for i in range(cards_from_1):
             player_2.add_get_out_free_card()
-        self.send_message(player_2.get_name() + " has traded " + str(cards_from_2) + " cards to " + player_1.get_name() + "!")
+
+        if not bankrupt:
+            self.send_message(player_2.get_name() + " has traded " + str(cards_from_2) + " cards to " + player_1.get_name() + "!")
         self.send_message(player_1.get_name() + " has traded " + str(cards_from_1) + " cards to " + player_2.get_name() + "!")
 
-        self.send_message("The trade has completed!")
+        player_1.sort_props_by_color()
+        player_2.sort_props_by_color()
+
+        if not bankrupt:
+            self.send_message("The trade has completed!")
 
     def purchase_house(self, id, property_id):
         player = self.players.get(id)
@@ -704,7 +835,7 @@ class Game:
         if type(property) == OtherProperty:
             self.send_message("You cannot buy houses on a Railroad or Utility!")
             return
-        
+
         if property.get_houses() == 4 or property.get_hotels() == 1:
             self.send_message("That property has the maximium number of houses already!")
             return
@@ -746,7 +877,11 @@ class Game:
             self.send_message("You cannot buy a hotel on a property that isn't yours!")
             return
 
-        if property.get_houses() < 4 or property.get_hotels() == 0:
+        if type(property) == OtherProperty:
+            self.send_message("You cannot buy hotels on a Railroad or Utility!")
+            return
+
+        if property.get_houses() < 4 or property.get_hotels() == 1:
             self.send_message("That property has too few houses or already has a hotel!")
             return
 
@@ -758,22 +893,111 @@ class Game:
         property.add_hotel()
         self.send_message("You have added a hotel to " + property.get_name() + "!")
 
+    def sell_house(self, id, property_id):
+        player = self.players.get(id)
+
+        if property_id < 0 or property_id >= len(player.get_properties()):
+            self.send_message("That is not a property you own.")
+            return
+
+        property = player.get_property_by_id(property_id)
+
+        if not self.check_player_existence_and_turn(player):
+            return
+
+        if property not in player.get_properties():
+            self.send_message("You cannot sell a house on a property that isn't yours!")
+            return
+
+        if type(property) == OtherProperty:
+            self.send_message("You cannot sell houses on a Railroad or Utility!")
+            return
+
+        if property.get_houses() == 0:
+            self.send_message("That property has no houses!")
+            return
+
+        color_count = 0
+        prop_color = property.get_color()
+        for p in player.get_properties():
+            if type(p) == Property and p.get_color() == prop_color:
+                color_count += 1
+
+        if color_count < 2 and (prop_color == "Blue" or prop_color == "Brown"):
+            self.send_message("You do not own the full set of this color property!")
+            return
+        if color_count < 3 and not (prop_color == "Blue" or prop_color == "Brown"):
+            self.send_message("You do not own the full set of this color property!")
+            return
+
+        player.add_money(property.get_house_cost())
+        property.remove_house()
+        self.send_message("You have removed a house from " + property.get_name() + "!")
+
+    def sell_hotel(self, id, property_id):
+        player = self.players.get(id)
+
+        if property_id < 0 or property_id >= len(player.get_properties()):
+            self.send_message("That is not a property you own.")
+            return
+
+        property = player.get_property_by_id(property_id)
+
+        if not self.check_player_existence_and_turn(player):
+            return
+
+        if property not in player.get_properties():
+            self.send_message("You cannot sell a hotel on a property that isn't yours!")
+            return
+
+        if type(property) == OtherProperty:
+            self.send_message("You cannot sell hotels on a Railroad or Utility!")
+            return
+
+        if property.get_hotels() == 0:
+            self.send_message("That property does not have a hotel!")
+            return
+
+        player.add_money(property.get_hotel_cost())
+        property.sell_hotel()
+        self.send_message("You have removed a hotel from " + property.get_name() + "!")
+
     def chance_result(self, player):
         # Due to the difficulty of implementation, I've skipped implementing
         # the chance card that say "Advance to the nearest..."
-        card = random.randint(0, 13)
+        card = random.randint(0, 12)
         if card == 0:
             self.send_message("Chance Card: Advance to Go! Collect $200!")
+            pos = player.get_position()
             player.set_position(0)
+
+            last_total_roll = player.get_total_roll()
+            player.add_to_total_roll(0 - pos)
+            current_total_roll = player.get_total_roll()
+            self.check_pass_go("passed", last_total_roll, current_total_roll, player)
+
             self.enact_roll_result(player)
         elif card == 1:
-            # Passing Go not yet implemented.
             self.send_message("Chance Card: Advance to Illinois Avenue!")
+            pos = player.get_position()
             player.set_position(24)
+
+            last_total_roll = player.get_total_roll()
+            player.add_to_total_roll(24 - pos)
+            current_total_roll = player.get_total_roll()
+            self.check_pass_go("passed", last_total_roll, current_total_roll, player)
+
             self.enact_roll_result(player)
         elif card == 2:
             self.send_message("Chance Card: Advance to St. Charles Place!")
+            pos = player.get_position()
             player.set_position(11)
+
+            last_total_roll = player.get_total_roll()
+            player.add_to_total_roll(11 - pos)
+            current_total_roll = player.get_total_roll()
+            self.check_pass_go("passed", last_total_roll, current_total_roll, player)
+
             self.enact_roll_result(player)
         elif card == 3:
             self.send_message("Chance Card: Band pays you dividend of $50.")
@@ -783,28 +1007,52 @@ class Game:
             player.add_out_free_card()
         elif card == 5:
             self.send_message("Chance Card: Go back three spaces!")
+
             player.set_position((player.get_position() - 3) % len(self.board))
+            player.add_to_total_roll(-3)
+
             self.enact_roll_result(player)
         elif card == 6:
             self.send_message("Chance Card: Go directly to jail!")
+            pos = player.get_position()
             player.set_position(10)
-            player.set_turns_in_jail(3)
+
+            player.add_to_total_roll(10 - pos)
+
+            player.set_turns_left_in_jail(3)
         elif card == 7:
             self.send_message("Chance Card: Make general repairs on all your property! For each house pay $25, for each hotel pay $100!")
             owed = 0
             for p in player.get_properties():
-                owed += p.get_houses() * 25 + p.get_hotels() * 100
-            self.pending_payments.append((player, None, owed))
+                if type(p) == Property:
+                    owed += p.get_houses() * 25 + p.get_hotels() * 100
+            self.send_message("You owe $" + str(owed) + " in total.")
+            if owed > 0:
+                self.pending_payments.append((player, None, owed))
         elif card == 8:
             self.send_message("Chance Card: Pay poor tax of $15.")
             self.pending_payments.append((player, None, 15))
         elif card == 9:
             self.send_message("Chance Card: Take a trip to Reading Railroad!")
+            pos = player.get_position()
             player.set_position(5)
+
+            last_total_roll = player.get_total_roll()
+            player.add_to_total_roll(5 - pos)
+            current_total_roll = player.get_total_roll()
+            self.check_pass_go("passed", last_total_roll, current_total_roll, player)
+
             self.enact_roll_result(player)
         elif card == 10:
             self.send_message("Chance Card: Take a walk on the Boardwalk!")
+            pos = player.get_position()
             player.set_position(len(self.board) - 1)
+
+            last_total_roll = player.get_total_roll()
+            player.add_to_total_roll((len(self.board) - 1) - pos)
+            current_total_roll = player.get_total_roll()
+            self.check_pass_go("passed", last_total_roll, current_total_roll, player)
+
             self.enact_roll_result(player)
         elif card == 11:
             self.send_message("Chance Card: You've been elected chairman of the board! Pay each player $50.")
@@ -815,10 +1063,17 @@ class Game:
             player.add_money(150)
 
     def cc_result(self, player):
-        card = random.randint(0, 15)
+        card = random.randint(0, 14)
         if card == 0:
             self.send_message("Community Chest Card: Advance to Go! Collect $200!")
+            pos = player.get_position()
             player.set_position(0)
+
+            last_total_roll = player.get_total_roll()
+            player.add_to_total_roll(0 - pos)
+            current_total_roll = player.get_total_roll()
+            self.check_pass_go("passed", last_total_roll, current_total_roll, player)
+
             self.enact_roll_result(player)
         elif card == 1:
             self.send_message("Community Chest Card: Bank error in your favor! Collect $200!")
@@ -831,11 +1086,15 @@ class Game:
             player.add_money(50)
         elif card == 4:
             self.send_message("Community Chest Card: You got a Get Out of Jail Free card!")
-            player.add_out_of_free_card()
+            player.add_out_free_card()
         elif card == 5:
             self.send_message("Community Chest Card: Go directly to jail!")
+            pos = player.get_position()
             player.set_position(10)
-            player.set_turns_in_jail(3)
+
+            player.add_to_total_roll(10 - pos)
+
+            player.set_turns_left_in_jail(3)
         elif card == 6:
             self.send_message("Community Chest Card: Holiday fund matures. Collect $100!")
             player.add_money(100)
@@ -845,7 +1104,8 @@ class Game:
         elif card == 8:
             self.send_message("Community Chest Card: It's your birthday! Collect $10 from each player.")
             for id in self.players.keys():
-                self.pending_payments.appned((self.players[id], player, 10))
+                if id != self.turn:
+                    self.pending_payments.append((self.players[id], player, 10))
         elif card == 9:
             self.send_message("Community Chest Card: Life insurance matures. Collect $100!")
             player.add_money(100)
@@ -859,8 +1119,11 @@ class Game:
             self.send_message("Community Chest Card: You are assessed for street repairs: Pay $40 per house and $115 per hotel you own.")
             owed = 0
             for p in player.get_properties():
-                owed += p.get_houses() * 40 + p.get_hotels() * 115
-            self.pending_payments.append((player, None, owed))
+                if type(p) == Property:
+                    owed += p.get_houses() * 40 + p.get_hotels() * 115
+            self.send_message("You owe $" + str(owed) + " in total.")
+            if owed > 0:
+                self.pending_payments.append((player, None, owed))
         elif card == 13:
             self.send_message("Community Chest Card: You won second place in a beauty contest. Receive $10!")
             player.add_money(10)
@@ -875,20 +1138,23 @@ class Game:
             return
 
         if self.board[position] == "Go":
-            self.send_message("You landed on Go! Collect $200.")
-            player.add_money(200)
+            #self.check_pass_go("landed on", 0, player.get_total_roll(), player)
             return
 
-        if self.board[position] == "Go to Jail":
+        if self.board[position] == "Go To Jail":
             self.send_message("You landed on Go To Jail! As you might expect, you're going to jail.")
+            pos = player.get_position()
             player.set_position(10)
-            player.set_turns_in_jail(3)
+
+            player.add_to_total_roll(10 - pos)
+
+            player.set_turns_left_in_jail(3)
             return
 
         if self.board[position] == "Free Parking":
             self.send_message("You landed on Free Parking!")
             return
-        
+
         if self.board[position] == "Jail" and player.get_turns_left_in_jail() != -1:
             self.send_message("You are currently in jail! Escape by rolling doubles, a Get Out of Jail Free card, or paying your $50 bail.")
             return
@@ -900,7 +1166,7 @@ class Game:
         if self.board[position] == "Chance":
             self.chance_result(player)
             return
-        
+
         if self.board[position] == "Community Chest":
             self.cc_result(player)
             return
@@ -921,17 +1187,18 @@ class Game:
 
             if property in self.available_properties:
                 self.send_message("This property is available! You can buy " + \
-                                  str(property.get_name()) + " for $" + str(property.get_cost()) + ".")
+                                  str(property.get_name()) + " (" + str(property.get_color()) + ") for $" + \
+                                  str(property.get_cost()) + ".")
                 return
             else:
                 if property not in player.get_properties():
                     owner = property.get_owner()
-                    rent = property.get_rent_cost()
+                    rent = property.get_rent()
                     self.send_message("You owe " + owner.get_name() + " $" + str(rent) + ".")
                     self.pending_payments.append((player, owner, rent))
                 else:
                     self.send_message("You own this property!")
-        
+
         if type(self.board[position]) == OtherProperty:
             property = self.board[position]
             self.send_message("You landed on " + property.get_name() + "!")
@@ -943,13 +1210,13 @@ class Game:
             else:
                 if property not in player.get_properties():
                     owner = property.get_owner()
-                    rent = property.get_rent_cost()
+                    rent = property.get_rent()
                     if property.get_type() == "Railroad":
                         num_railroads = 0
                         for p in owner.get_properties():
                             if type(p) == OtherProperty and p.get_type() == "Railroad":
                                 num_railroads += 1
-                        self.send_message("You owe " + owner.get_name() + " $" + str(rent * num_railroads) + ".")
+                        self.send_message("You owe " + owner.get_name() + " $" + str(rent * 2 ** (num_railroads - 1)) + ".")
                         self.pending_payments.append((player, owner, rent * num_railroads))
                     elif property.get_type() == "Utility":
                         num_utils = 0
@@ -967,23 +1234,26 @@ class Game:
     def bankrupt(self, id_1, id_2):
         # Player 1 bankrupts to Player 2.
         player_1 = self.players.get(id_1)
-        player_2 = self.players.get(id_2)
+        player_2 = self.get_player_by_local_id(id_2)
 
         if player_1 is None:
             self.send_message("You do not seem to exist!")
             return
-        
+
         if player_2 is None:
             self.send_message("The other player does not seem to exist!")
             return
 
-        self.send_message(player_1.get_name() + " has bankrupted to " + player_2.get_name() + "!")
         self.pending_trade = (player_1, player_2, player_1.get_money(), 0, player_1.get_properties(), [],
                               player_1.get_get_out_free_cards(), 0, True, True)
         self.trade()
+        self.send_message(player_1.get_name() + " has bankrupted to " + player_2.get_name() + "!")
+
+        self.ids.remove(self.players[id_1].get_id())
         del self.players[id_1]
-        self.ids.remove(id_1)
         self.turn = self.turn % len(self.players)
+
+        self.send_message("The current player's turn is: " + self.get_player_by_local_id(self.turn).get_name())
 
     def roll_dice(self, id):
         player = self.players.get(id)
@@ -994,7 +1264,7 @@ class Game:
         if sum(self.last_roll) != -1:
             self.send_message("You already rolled this turn!")
             return
-        
+
         roll = self.dice.roll()
         self.has_doubles = self.dice.check_doubles(roll)
 
@@ -1006,6 +1276,9 @@ class Game:
 
         self.send_message(text)
 
+        if self.has_doubles:
+            self.send_message("You rolled doubles! You'll get an extra turn after this.")
+
         if player.get_turns_left_in_jail() > 0 and self.has_doubles:
             player.set_turns_left_in_jail(-1)
             self.last_roll = [-1]
@@ -1016,15 +1289,21 @@ class Game:
             self.send_message("You did not escape jail! You can wait, pay $50 bail, or use a Get Out of Jail Free card.")
             self.last_roll = roll
         else:
+            player.set_turns_left_in_jail(-1)
+
+            last_total_roll = player.get_total_roll()
             self.last_roll = roll
             player.set_position((player.get_position() + sum(roll)) % len(self.board))
+            player.add_to_total_roll(sum(roll))
+            current_total_roll = player.get_total_roll()
+
+            self.check_pass_go("passed", last_total_roll, current_total_roll, player)
+
             self.enact_roll_result(player)
 
 """
 if __name__ == "__main__":
     players = {"0" : "name", "1" : "name2"}
     game = Game("test", players)
-    game.roll_dice("0")
-    game.purchase_property("0")
-    game.end_turn("0")
+    game.bankrupt("1")
 """

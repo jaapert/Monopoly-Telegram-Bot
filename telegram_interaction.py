@@ -4,11 +4,11 @@ from __future__ import unicode_literals
 import monopoly
 
 import telegram
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
+from telegram.ext import Updater, CommandHandler
 from telegram.error import TelegramError, Unauthorized
 import logging
 
-import sys, os, threading, time
+import os
 
 
 with open("api_key.txt", 'r') as f:
@@ -44,8 +44,11 @@ def send_info(bot, chat_id, game, user_id):
     props = player.get_properties_str()
     money = player.get_money()
     cards = player.get_get_out_free_cards()
+    total_assets = player.get_total_assets()
     bot.send_message(chat_id=user_id,
-                     text=props + "\n\nYour money: $" + str(money) + "\n\n" + "Your cards: " + str(cards))
+                     text=props + "\n\nYour money: $" + str(money) +
+                                  "\n\nYour cards: " + str(cards) +
+                                  "\n\nTotal assets: $" + str(total_assets))
 
 
 def send_infos(bot, chat_id, game, players):
@@ -140,8 +143,7 @@ def listplayers_handler(bot, update, chat_data):
             text += name + "\n"
     elif game is not None:
         for user_id, name in chat_data.get("pending_players", {}).items():
-            num_cards_str = str(len(game.get_player(user_id).get_hand()))
-            text += "(" + str(game.get_player(user_id).get_id()) + ") " + name + "\n"
+            text += "(" + str(game.get_players()[user_id].get_id()) + ") " + name + "\n"
     else:
         text = open("static_responses/listplayers_failure.txt", "r").read()
 
@@ -155,10 +157,10 @@ def feedback_handler(bot, update, args):
     """
     if args and len(args) > 0:
         feedback = open("feedback.txt\n", "a+")
-        feedback.write(update.message.from_user.first_name + "\n")
+        feedback.write(update.message.from_user.first_name + " (")
         # Records User ID so that if feature is implemented, can message them
         # about it.
-        feedback.write(str(update.message.from_user.id) + "\n")
+        feedback.write(str(update.message.from_user.id) + "): ")
         feedback.write(" ".join(args) + "\n")
         feedback.close()
         bot.send_message(chat_id=update.message.chat_id, text="Thanks for the feedback!")
@@ -181,10 +183,10 @@ def startgame_handler(bot, update, chat_data):
         bot.send_message(chat_id=chat_id, text=text)
         return
 
-    """if len(pending_players) < MIN_PLAYERS:
+    if len(pending_players) < MIN_PLAYERS:
         text = open("static_responses/start_game_min_threshold.txt", "r").read()
         bot.send_message(chat_id=chat_id, text=text)
-        return"""
+        return
 
     try:
         for user_id, nickname in pending_players.items():
@@ -234,7 +236,7 @@ def roll_handler(bot, update, chat_data):
 
     players = game.get_players()
     if len(players) == 1:
-        winner = list(players.items())[0]
+        winner = list(players.values())[0]
         bot.send_message(chat_id=chat_id, text=winner.get_name() + " has won!")
         endgame_handler(bot, update, chat_data)
         return
@@ -258,7 +260,7 @@ def bankrupt_handler(bot, update, chat_data, args):
 
     players = game.get_players()
     if len(players) == 1:
-        winner = list(players.items())[0]
+        winner = list(players.values())[0]
         bot.send_message(chat_id=chat_id, text=winner.get_name() + " has won!")
         endgame_handler(bot, update, chat_data)
         return
@@ -285,13 +287,43 @@ def purchase_hotel_handler(bot, update, chat_data, args):
     game = chat_data.get("game_obj")
 
     if len(args) != 1:
-        bot.send_message(chat_id=chat_id, text="Usage: /buyhouse property_id")
+        bot.send_message(chat_id=chat_id, text="Usage: /buyhotel property_id")
         return
 
     if not check_game_existence(chat_id, game):
         return
 
     game.purchase_hotel(user_id, int(" ".join(args)))
+
+
+def sell_house_handler(bot, update, chat_data, args):
+    chat_id = update.message.chat.id
+    user_id = update.message.from_user.id
+    game = chat_data.get("game_obj")
+
+    if len(args) != 1:
+        bot.send_message(chat_id=chat_id, text="Usage: /sellhouse property_id")
+        return
+
+    if not check_game_existence(chat_id, game):
+        return
+
+    game.sell_house(user_id, int(" ".join(args)))
+
+
+def sell_hotel_handler(bot, update, chat_data, args):
+    chat_id = update.message.chat.id
+    user_id = update.message.from_user.id
+    game = chat_data.get("game_obj")
+
+    if len(args) != 1:
+        bot.send_message(chat_id=chat_id, text="Usage: /sellhotel property_id")
+        return
+
+    if not check_game_existence(chat_id, game):
+        return
+
+    game.sell_hotel(user_id, int(" ".join(args)))
 
 
 def purchase_property_handler(bot, update, chat_data):
@@ -328,10 +360,7 @@ def pay_handler(bot, update, chat_data, args):
     if not check_game_existence(chat_id, game):
         return
 
-    if args[0] == "bank":
-        game.pay(user_id, args[0], int(args[1]))
-    else:
-        game.pay(user_id, int(args[0]), int(args[1]))
+    game.pay(user_id, args[0], int(args[1]))
 
 
 def get_out_of_jail_free_handler(bot, update, chat_data):
@@ -368,7 +397,22 @@ def mortgage_handler(bot, update, chat_data, args):
     if not check_game_existence(chat_id, game):
         return
 
-    game.purchase_house(user_id, int(" ".join(args)))
+    game.mortgage_property(user_id, int(" ".join(args)))
+
+
+def unmortgage_handler(bot, update, chat_data, args):
+    chat_id = update.message.chat.id
+    user_id = update.message.from_user.id
+    game = chat_data.get("game_obj")
+
+    if len(args) != 1:
+        bot.send_message(chat_id=chat_id, text="Usage: /unmortgage property_id")
+        return
+
+    if not check_game_existence(chat_id, game):
+        return
+
+    game.unmortgage_property(user_id, int(" ".join(args)))
 
 
 def cancel_trade_handler(bot, update, chat_data):
@@ -450,7 +494,7 @@ def setup_trade_handler(bot, update, chat_data, args):
     game = chat_data.get("game_obj")
 
     if len(args) != 1:
-        bot.send_message(chat_id=chat_id, text="Usage: /begintrade player_id")
+        bot.send_message(chat_id=chat_id, text="Usage: /setuptrade player_id")
         return
 
     if not check_game_existence(chat_id, game):
@@ -482,14 +526,13 @@ def blame_handler(bot, update, chat_data):
     if not check_game_existence(chat_id, game):
         return
 
-    if not game.get_ready_to_play():
-        text = open("static_responses/not_all_ready_failure.txt", "r").read()
-        bot.send_message(chat_id=chat_id, text=text)
-        return
-
-    for user_id, nickname in game.get_players().items():
-        if game.get_player_id_by_num(game.turn) == user_id:
-            bot.send_message(chat_id=chat_id, text="[{}](tg://user?id={})".format(nickname, user_id),
+    for user_id, player in game.get_players().items():
+        if game.get_player_by_local_id(game.turn).get_user_id() == user_id:
+            for (payer, payee, amount) in game.get_pending_payments():
+                bot.send_message(chat_id=chat_id, text="[{}](tg://user?id={})".format(payer.get_name(), payer.get_user_id()),
+                                 parse_mode=telegram.ParseMode.MARKDOWN)
+                return
+            bot.send_message(chat_id=chat_id, text="[{}](tg://user?id={})".format(player.get_name(), user_id),
                              parse_mode=telegram.ParseMode.MARKDOWN)
             return
 
@@ -528,11 +571,12 @@ if __name__ == "__main__":
     purchase_house_aliases = ["purchasehouse", "buyhouse", "bh", "ph"]
     purchase_hotel_aliases = ["purchasehotel", "buyhotel", "bhh", "phh"]
     purchase_property_aliases = ["purchaseproperty", "buyproperty", "buyprop", "purchaseprop", "bp"]
-    end_turn_aliases = ["end", "endturn"]
+    end_turn_aliases = ["end", "endturn", "endme"]
     pay_aliases = ["pay", "p"]
-    get_out_aliases = ["out", "freeme", "usecard"]
+    get_out_aliases = ["out", "freeme", "usecard", "goofg"]
     bail_aliases = ["bail", "paybail"]
     mortgage_aliases = ["mortgage", "m"]
+    unmortgage_aliases = ["unmortgage", "um"]
     cancel_trade_aliases = ["canceltrade", "ct"]
     add_trade_aliases = ["addtrade", "at"]
     remove_trade_aliases = ["removetrade", "rt"]
@@ -541,6 +585,9 @@ if __name__ == "__main__":
     trade_aliases = ["trade"]
     setup_trade_aliases = ["setuptrade", "st"]
     assets_aliases = ["assets", "mystuff"]
+    blame_aliases = ["blame", "blam"]
+    sell_house_aliases = ["sellhouse", "sh"]
+    sell_hotel_aliases = ["sellhotel", "shh"]
 
     commands = [("feedback", 0, feedback_aliases),
                 ("newgame", 1, newgame_aliases),
@@ -553,12 +600,13 @@ if __name__ == "__main__":
                 ("bankrupt", 2, bankrupt_aliases),
                 ("purchase_house", 2, purchase_house_aliases),
                 ("purchase_hotel", 2, purchase_hotel_aliases),
-                ("purchase_property", 2, purchase_property_aliases),
+                ("purchase_property", 1, purchase_property_aliases),
                 ("end_turn", 1, end_turn_aliases),
                 ("pay", 2, pay_aliases),
                 ("get_out_of_jail_free", 1, get_out_aliases),
                 ("bail", 1, bail_aliases),
                 ("mortgage", 2, mortgage_aliases),
+                ("unmortgage", 2, unmortgage_aliases),
                 ("cancel_trade", 1, cancel_trade_aliases),
                 ("add_to_trade", 2, add_trade_aliases),
                 ("remove_from_trade", 2, remove_trade_aliases),
@@ -566,7 +614,10 @@ if __name__ == "__main__":
                 ("disagree", 1, disagree_aliases),
                 ("trade", 1, trade_aliases),
                 ("setup_trade", 2, setup_trade_aliases),
-                ("assets", 1, assets_aliases)]
+                ("assets", 1, assets_aliases),
+                ("blame", 1, blame_aliases),
+                ("sell_house", 2, purchase_house_aliases),
+                ("sell_hotel", 2, purchase_hotel_aliases)]
     for c in commands:
         func = locals()[c[0] + "_handler"]
         if c[1] == 0:
@@ -584,10 +635,10 @@ if __name__ == "__main__":
 
     logging.basicConfig(
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        level=logging.INFO, filename='logging.txt', filemode='a')
+        level=logging.INFO, filename='logging.txt', filemode='a+')
 
-    updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
-    updater.bot.set_webhook("https://la-monopoly-bot.herokuapp.com/" + TOKEN)
+    #updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
+    #updater.bot.set_webhook("https://la-monopoly-bot.herokuapp.com/" + TOKEN)
 
-    #updater.start_polling()
+    updater.start_polling()
     updater.idle()
