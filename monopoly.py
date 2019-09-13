@@ -90,7 +90,7 @@ class Player:
                         " [Mortgage Value: " + str(p.get_mortgage_value()) + "] " + \
                         ("[[Mortgaged]]\n" if p.get_mortgaged() else "\n")
             elif type(p) == OtherProperty:
-                text += "(" + str(count) + ") " + p.get_name() + " : " + p.get_type() + "\n" + \
+                text += "(" + str(count) + ") " + p.get_name() + " : " + p.get_type() + \
                         " [Mortgage Value: " + str(p.get_mortgage_value()) + "] " + \
                         ("[[Mortgaged]]\n" if p.get_mortgaged() else "\n")
             count += 1
@@ -260,7 +260,8 @@ class Game:
         # Make pending payments a list of tuples in the form (from, to, amount)
         self.pending_payments = []
         self.last_roll = [-1]
-        # (player_1, player_2, money_from_1, money_from_2, props_from_1, props_from_2, cards_from_1, cards_from_2, agreed_1, agreed_2)
+        # (player_1, player_2, money_from_1, money_from_2, props_from_1,
+        # props_from_2, cards_from_1, cards_from_2, agreed_1, agreed_2)
         self.pending_trade = None
         self.ids = []
         self.board = \
@@ -308,7 +309,8 @@ class Game:
         ]
         # Somewhat ugly, but I need the reference to the object not a copy.
         self.available_properties = list(filter(lambda x: x is not None,
-                                           [p if type(p) == Property or type(p) == OtherProperty else None for p in self.board]))
+                                           [p if type(p) == Property or type(p) == OtherProperty
+                                            else None for p in self.board]))
 
         count = 0
         # Maybe randomize for fairness? It matters a bit in Monopoly.
@@ -356,7 +358,7 @@ class Game:
 
     def get_player_by_name(self, name):
         for p in self.players.values():
-            if p.get_name() == name:
+            if p.get_name().lower() == name.lower():
                 return p
         return None
 
@@ -412,8 +414,8 @@ class Game:
         if to_id is None or to_id == "bank":
             payee = None
         else:
-            if to_id.is_integer():
-                payee = self.get_player_by_local_id(to_id)
+            if to_id.isdigit():
+                payee = self.get_player_by_local_id(int(to_id))
             else:
                 payee = self.get_player_by_name(to_id)
 
@@ -430,7 +432,8 @@ class Game:
                 self.send_message("You do not have enough total assets to pay the bank!")
                 self.send_message("You can either go bankrupt or convince someone else to trade for what you need!")
             else:
-                self.send_message("You have enough total assets to pay the bank, but need to sell some houses or mortgage properties.")
+                self.send_message("You have enough total assets to pay the bank, but need to sell some houses or "
+                                  "mortgage properties.")
         else:
             if payer.get_money() >= amount:
                 payer.add_money(-amount)
@@ -828,7 +831,8 @@ class Game:
             self.send_message("You cannot trade more money than you have!")
             return
 
-        if not all(p in player_1.get_properties() for p in props_from_1) or not all(p in player_2.get_properties() for p in props_from_2):
+        if not all(p in player_1.get_properties() for p in props_from_1) or not all(p in player_2.get_properties()
+                                                                                    for p in props_from_2):
             self.send_message("You cannot trade properties you do not have!")
             return
 
@@ -839,10 +843,12 @@ class Game:
         if not bankrupt:
             player_1.add_money(-money_from_1)
             player_1.add_money(money_from_2)
-            self.send_message(player_2.get_name() + " has traded $" + str(money_from_2) + " to " + player_1.get_name() + "!")
+            self.send_message(player_2.get_name() + " has traded $" + str(money_from_2) +
+                              " to " + player_1.get_name() + "!")
         player_2.add_money(-money_from_2)
         player_2.add_money(money_from_1)
-        self.send_message(player_1.get_name() + " has traded $" + str(money_from_1) + " to " + player_2.get_name() + "!")
+        self.send_message(player_1.get_name() + " has traded $" + str(money_from_1) +
+                          " to " + player_2.get_name() + "!")
 
         if not bankrupt:
             for p in props_from_2:
@@ -1077,7 +1083,8 @@ class Game:
 
             player.set_turns_left_in_jail(3)
         elif card == 7:
-            self.send_message("Chance Card: Make general repairs on all your property! For each house pay $25, for each hotel pay $100!")
+            self.send_message("Chance Card: Make general repairs on all your property! For each house pay $25, "
+                              "for each hotel pay $100!")
             owed = 0
             for p in player.get_properties():
                 if type(p) == Property:
@@ -1161,7 +1168,7 @@ class Game:
         elif card == 8:
             self.send_message("Community Chest Card: It's your birthday! Collect $10 from each player.")
             for id in self.players.keys():
-                if id != self.turn:
+                if id != player.get_id():
                     self.pending_payments.append((self.players[id], player, 10))
         elif card == 9:
             self.send_message("Community Chest Card: Life insurance matures. Collect $100!")
@@ -1173,7 +1180,8 @@ class Game:
             self.send_message("Community Chest Card: Receive $25 consultancy fee!")
             player.add_money(25)
         elif card == 12:
-            self.send_message("Community Chest Card: You are assessed for street repairs: Pay $40 per house and $115 per hotel you own.")
+            self.send_message("Community Chest Card: You are assessed for street repairs: Pay $40 per house "
+                              "and $115 per hotel you own.")
             owed = 0
             for p in player.get_properties():
                 if type(p) == Property:
@@ -1214,7 +1222,8 @@ class Game:
             return
 
         if self.board[position] == "Jail" and player.get_turns_left_in_jail() != -1:
-            self.send_message("You are currently in jail! Escape by rolling doubles, a Get Out of Jail Free card, or paying your $50 bail.")
+            self.send_message("You are currently in jail! Escape by rolling doubles, a Get Out of Jail Free card, "
+                              "or paying your $50 bail.")
             return
 
         if self.board[position] == "Jail" and player.get_turns_left_in_jail() == -1:
@@ -1345,7 +1354,8 @@ class Game:
             self.send_message("You escaped jail!")
         elif player.get_turns_left_in_jail() > 0 and not self.has_doubles:
             player.set_turns_left_in_jail(player.get_turns_left_in_jail() - 1)
-            self.send_message("You did not escape jail! You can wait, pay $50 bail, or use a Get Out of Jail Free card.")
+            self.send_message("You did not escape jail! You can wait, pay $50 bail, "
+                              "or use a Get Out of Jail Free card.")
             self.last_roll = roll
         else:
             player.set_turns_left_in_jail(-1)

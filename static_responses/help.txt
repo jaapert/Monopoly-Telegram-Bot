@@ -30,3 +30,4 @@ Here's a list of helpful commands:
 /trade will commence the pending trade if both players have agreed.
 /setuptrade [player_id] will begin a trade between you and the player with that ID.
 /assets will send you your current money, properties, and cards.
+/aa will display everyone's assets in the chat.

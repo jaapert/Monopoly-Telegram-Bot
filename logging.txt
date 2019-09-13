@@ -1123,3 +1123,40 @@ Traceback (most recent call last):
     return
 AttributeError: 'Player' object has no attribute 'add_get_out_free_card'
 2019-09-13 13:54:22,093 - telegram.ext.updater - INFO - Received signal 2 (SIGINT), stopping...
+2019-09-13 14:00:32,836 - telegram.ext.updater - INFO - Received signal 2 (SIGINT), stopping...
+2019-09-13 14:02:33,803 - telegram.ext.dispatcher - ERROR - An uncaught error was raised while processing the update
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/site-packages/telegram/ext/dispatcher.py", line 279, in process_update
+    handler.handle_update(update, self)
+  File "/usr/local/lib/python3.7/site-packages/telegram/ext/commandhandler.py", line 173, in handle_update
+    return self.callback(dispatcher.bot, update, **optional_args)
+  File "/Users/logan/PycharmProjects/MonopolyTelegramBot/telegram_interaction.py", line 364, in pay_handler
+    game.pay(user_id, args[0], int(args[1]))
+  File "/Users/logan/PycharmProjects/MonopolyTelegramBot/monopoly.py", line 417, in pay
+    if to_id.is_integer():
+AttributeError: 'str' object has no attribute 'is_integer'
+2019-09-13 14:02:48,613 - telegram.ext.dispatcher - ERROR - An uncaught error was raised while processing the update
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.7/site-packages/telegram/ext/dispatcher.py", line 279, in process_update
+    handler.handle_update(update, self)
+  File "/usr/local/lib/python3.7/site-packages/telegram/ext/commandhandler.py", line 173, in handle_update
+    return self.callback(dispatcher.bot, update, **optional_args)
+  File "/Users/logan/PycharmProjects/MonopolyTelegramBot/telegram_interaction.py", line 364, in pay_handler
+    game.pay(user_id, args[0], int(args[1]))
+  File "/Users/logan/PycharmProjects/MonopolyTelegramBot/monopoly.py", line 417, in pay
+    if to_id.is_integer():
+AttributeError: 'str' object has no attribute 'is_integer'
+2019-09-13 14:03:35,837 - telegram.ext.updater - INFO - Received signal 2 (SIGINT), stopping...
+2019-09-13 14:39:17,728 - telegram.ext.updater - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running (409)
+2019-09-13 14:39:17,731 - __main__ - WARNING - Telegram Error! Conflict: terminated by other getUpdates request; make sure that only one bot instance is running (409) caused by this update: None
+2019-09-13 14:39:23,053 - telegram.ext.updater - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running (409)
+2019-09-13 14:39:23,053 - __main__ - WARNING - Telegram Error! Conflict: terminated by other getUpdates request; make sure that only one bot instance is running (409) caused by this update: None
+2019-09-13 14:39:29,265 - telegram.ext.updater - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running (409)
+2019-09-13 14:39:29,265 - __main__ - WARNING - Telegram Error! Conflict: terminated by other getUpdates request; make sure that only one bot instance is running (409) caused by this update: None
+2019-09-13 14:39:35,732 - telegram.ext.updater - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running (409)
+2019-09-13 14:39:35,733 - __main__ - WARNING - Telegram Error! Conflict: terminated by other getUpdates request; make sure that only one bot instance is running (409) caused by this update: None
+2019-09-13 14:39:43,328 - telegram.ext.updater - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running (409)
+2019-09-13 14:39:43,328 - __main__ - WARNING - Telegram Error! Conflict: terminated by other getUpdates request; make sure that only one bot instance is running (409) caused by this update: None
+2019-09-13 14:39:50,905 - telegram.ext.updater - ERROR - Error while getting Updates: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running (409)
+2019-09-13 14:39:50,906 - __main__ - WARNING - Telegram Error! Conflict: terminated by other getUpdates request; make sure that only one bot instance is running (409) caused by this update: None
+2019-09-13 14:40:00,935 - telegram.ext.updater - INFO - Received signal 2 (SIGINT), stopping...

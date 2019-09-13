@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c461b1ad-79e5-4e69-b8e5-b80ce370e890" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/logging.txt" afterPath="$PROJECT_DIR$/logging.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/monopoly.py" afterPath="$PROJECT_DIR$/monopoly.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static_responses/help.txt" afterPath="$PROJECT_DIR$/static_responses/help.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/telegram_interaction.py" afterPath="$PROJECT_DIR$/telegram_interaction.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,8 +19,8 @@
       <file leaf-file-name="monopoly.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/monopoly.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="262">
-              <caret line="665" column="75" lean-forward="true" selection-start-line="665" selection-start-column="75" selection-end-line="665" selection-end-column="75" />
+            <state relative-caret-position="3300">
+              <caret line="220" column="0" lean-forward="false" selection-start-line="220" selection-start-column="0" selection-end-line="220" selection-end-column="0" />
               <folding>
                 <element signature="e#24#63#0" expanded="true" />
               </folding>
@@ -32,8 +31,8 @@
       <file leaf-file-name="telegram_interaction.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/telegram_interaction.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="600" column="14" lean-forward="false" selection-start-line="600" selection-start-column="4" selection-end-line="600" selection-end-column="14" />
+            <state relative-caret-position="-7897">
+              <caret line="112" column="56" lean-forward="true" selection-start-line="112" selection-start-column="56" selection-end-line="112" selection-end-column="56" />
               <folding>
                 <element signature="e#24#63#0" expanded="true" />
               </folding>
@@ -44,8 +43,8 @@
       <file leaf-file-name="logging.txt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/logging.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="1123" column="71" lean-forward="false" selection-start-line="1123" selection-start-column="50" selection-end-line="1123" selection-end-column="71" />
+            <state relative-caret-position="0">
+              <caret line="284" column="0" lean-forward="false" selection-start-line="284" selection-start-column="0" selection-end-line="284" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -62,12 +61,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>.add_property</find>
-      <find>.remove_property</find>
-      <find>type(prop</find>
-      <find>get_houses</find>
-      <find>feedback</find>
-      <find>payments</find>
       <find>get_pending_payments</find>
       <find>pending_payments</find>
       <find>blame_handler</find>
@@ -75,7 +68,6 @@
       <find>pay</find>
       <find>pay_handler</find>
       <find>get_player</find>
-      <find>get_player_by</find>
       <find>get_color()</find>
       <find>purchase_property</find>
       <find>def pay</find>
@@ -92,6 +84,13 @@
       <find>purchase_house</find>
       <find>add_get_out_free_card</find>
       <find>bankrupt</find>
+      <find>def add_to_trade</find>
+      <find>----</find>
+      <find>-----</find>
+      <find>.is_integer</find>
+      <find>get_player_by</find>
+      <find>first</find>
+      <find>birthday</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -107,9 +106,9 @@
         <option value="$PROJECT_DIR$/runtime.txt" />
         <option value="$PROJECT_DIR$/static_responses/start.txt" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/static_responses/help.txt" />
-        <option value="$PROJECT_DIR$/telegram_interaction.py" />
         <option value="$PROJECT_DIR$/logging.txt" />
+        <option value="$PROJECT_DIR$/telegram_interaction.py" />
+        <option value="$PROJECT_DIR$/static_responses/help.txt" />
         <option value="$PROJECT_DIR$/monopoly.py" />
       </list>
     </option>
@@ -143,6 +142,11 @@
             <path>
               <item name="MonopolyTelegramBot" type="b2602c69:ProjectViewProjectNode" />
               <item name="MonopolyTelegramBot" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MonopolyTelegramBot" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MonopolyTelegramBot" type="462c0819:PsiDirectoryNode" />
+              <item name="static_responses" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -234,12 +238,11 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="693" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18093699" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32838285" sideWeight="0.503231" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32943144" sideWeight="0.49676898" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32943144" sideWeight="0.49676898" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32838285" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24959612" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -630,36 +633,36 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/logging.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="284" column="0" lean-forward="false" selection-start-line="284" selection-start-column="0" selection-end-line="284" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/static_responses/help.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="271">
-          <caret line="31" column="64" lean-forward="false" selection-start-line="31" selection-start-column="64" selection-end-line="31" selection-end-column="64" />
+        <state relative-caret-position="269">
+          <caret line="32" column="47" lean-forward="false" selection-start-line="32" selection-start-column="47" selection-end-line="32" selection-end-column="47" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/telegram_interaction.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="600" column="14" lean-forward="false" selection-start-line="600" selection-start-column="4" selection-end-line="600" selection-end-column="14" />
+        <state relative-caret-position="-7897">
+          <caret line="112" column="56" lean-forward="true" selection-start-line="112" selection-start-column="56" selection-end-line="112" selection-end-column="56" />
           <folding>
             <element signature="e#24#63#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logging.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="1123" column="71" lean-forward="false" selection-start-line="1123" selection-start-column="50" selection-end-line="1123" selection-end-column="71" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/monopoly.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="262">
-          <caret line="665" column="75" lean-forward="true" selection-start-line="665" selection-start-column="75" selection-end-line="665" selection-end-column="75" />
+        <state relative-caret-position="3300">
+          <caret line="220" column="0" lean-forward="false" selection-start-line="220" selection-start-column="0" selection-end-line="220" selection-end-column="0" />
           <folding>
             <element signature="e#24#63#0" expanded="true" />
           </folding>

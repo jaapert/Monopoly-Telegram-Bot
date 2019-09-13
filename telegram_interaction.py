@@ -49,7 +49,7 @@ def send_info(bot, chat_id, game, user_id, send_id):
                      text=props + "\n\n" + player.get_name() + " money: $" + str(money) +
                                   "\n\n" + player.get_name() + " cards: " + str(cards) +
                                   "\n\n" + player.get_name() + " total assets: $" + str(total_assets) +
-                                  "-----")
+                                  "\n-----\n\n")
 
 
 def send_infos(bot, chat_id, game, players):
@@ -530,10 +530,12 @@ def blame_handler(bot, update, chat_data):
     for user_id, player in game.get_players().items():
         if game.get_player_by_local_id(game.turn).get_user_id() == user_id:
             for (payer, payee, amount) in game.get_pending_payments():
-                bot.send_message(chat_id=chat_id, text="[{}](tg://user?id={})".format(payer.get_name(), payer.get_user_id()),
+                bot.send_message(chat_id=chat_id, text="[{}](tg://user?id={})".format(payer.get_name(),
+                                                                                      payer.get_user_id()),
                                  parse_mode=telegram.ParseMode.MARKDOWN)
                 return
-            bot.send_message(chat_id=chat_id, text="[{}](tg://user?id={})".format(player.get_name(), user_id),
+            bot.send_message(chat_id=chat_id, text="[{}](tg://user?id={})".format(player.get_name(),
+                                                                                  user_id),
                              parse_mode=telegram.ParseMode.MARKDOWN)
             return
 
