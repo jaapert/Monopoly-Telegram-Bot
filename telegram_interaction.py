@@ -39,21 +39,22 @@ def check_game_existence(chat_id, game):
     return True
 
 
-def send_info(bot, chat_id, game, user_id):
+def send_info(bot, chat_id, game, user_id, send_id):
     player = game.players.get(user_id)
     props = player.get_properties_str()
     money = player.get_money()
     cards = player.get_get_out_free_cards()
     total_assets = player.get_total_assets()
-    bot.send_message(chat_id=user_id,
-                     text=props + "\n\nYour money: $" + str(money) +
-                                  "\n\nYour cards: " + str(cards) +
-                                  "\n\nTotal assets: $" + str(total_assets))
+    bot.send_message(chat_id=send_id,
+                     text=props + "\n\n" + player.get_name() + " money: $" + str(money) +
+                                  "\n\n" + player.get_name() + " cards: " + str(cards) +
+                                  "\n\n" + player.get_name() + " total assets: $" + str(total_assets) +
+                                  "-----")
 
 
 def send_infos(bot, chat_id, game, players):
     for user_id, nickname in players.items():
-        send_info(bot, chat_id, game, user_id)
+        send_info(bot, chat_id, game, user_id, user_id)
 
 
 def newgame_handler(bot, update, chat_data):
@@ -432,7 +433,7 @@ def add_to_trade_handler(bot, update, chat_data, args):
     game = chat_data.get("game_obj")
 
     if len(args) != 3:
-        bot.send_message(chat_id=chat_id, text="Usage: /addtrade property_id money num_get_out_free_cards")
+        bot.send_message(chat_id=chat_id, text="Usage: /addtrade {property_id or -1} money num_get_out_free_cards")
         return
 
     if not check_game_existence(chat_id, game):
@@ -447,7 +448,7 @@ def remove_from_trade_handler(bot, update, chat_data, args):
     game = chat_data.get("game_obj")
 
     if len(args) != 3:
-        bot.send_message(chat_id=chat_id, text="Usage: /removetrade property_id money num_get_out_free_cards")
+        bot.send_message(chat_id=chat_id, text="Usage: /removetrade {property_id or -1} money num_get_out_free_cards")
         return
 
     if not check_game_existence(chat_id, game):
@@ -513,7 +514,7 @@ def assets_handler(bot, update, chat_data):
     elif user_id not in game.get_players():
         text = open("static_responses/leave_id_missing_failure.txt", "r").read()
     else:
-        send_info(bot, chat_id, game, user_id)
+        send_info(bot, chat_id, game, user_id, user_id)
         return
 
     bot.send_message(chat_id=user_id, text=text)
@@ -535,6 +536,17 @@ def blame_handler(bot, update, chat_data):
             bot.send_message(chat_id=chat_id, text="[{}](tg://user?id={})".format(player.get_name(), user_id),
                              parse_mode=telegram.ParseMode.MARKDOWN)
             return
+
+
+def all_assets_handler(bot, update, chat_data):
+    chat_id = update.message.chat_id
+    game = chat_data.get("game_obj")
+
+    if not check_game_existence(chat_id, game):
+        return
+
+    for user_id, player in game.get_players().items():
+        send_info(bot, chat_id, game, user_id, chat_id)
 
 
 def handle_error(bot, update, error):
@@ -588,6 +600,7 @@ if __name__ == "__main__":
     blame_aliases = ["blame", "blam"]
     sell_house_aliases = ["sellhouse", "sh"]
     sell_hotel_aliases = ["sellhotel", "shh"]
+    all_assets_aliases = ["allassets", "aa"]
 
     commands = [("feedback", 0, feedback_aliases),
                 ("newgame", 1, newgame_aliases),
@@ -617,7 +630,8 @@ if __name__ == "__main__":
                 ("assets", 1, assets_aliases),
                 ("blame", 1, blame_aliases),
                 ("sell_house", 2, purchase_house_aliases),
-                ("sell_hotel", 2, purchase_hotel_aliases)]
+                ("sell_hotel", 2, purchase_hotel_aliases),
+                ("all_assets", 1, all_assets_aliases)]
     for c in commands:
         func = locals()[c[0] + "_handler"]
         if c[1] == 0:
@@ -637,8 +651,8 @@ if __name__ == "__main__":
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         level=logging.INFO, filename='logging.txt', filemode='a+')
 
-    updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
-    updater.bot.set_webhook("https://la-monopoly-bot.herokuapp.com/" + TOKEN)
+    #updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
+    #updater.bot.set_webhook("https://la-monopoly-bot.herokuapp.com/" + TOKEN)
 
-    #updater.start_polling()
+    updater.start_polling()
     updater.idle()
