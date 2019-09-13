@@ -344,6 +344,12 @@ class Game:
                 return p
         return None
 
+    def get_player_by_name(self, name):
+        for p in self.players.values():
+            if p.get_name() == name:
+                return p
+        return None
+
     def pay_bail(self, id):
         player = self.players.get(id)
 
@@ -396,7 +402,10 @@ class Game:
         if to_id is None or to_id == "bank":
             payee = None
         else:
-            payee = self.get_player_by_local_id(to_id)
+            if isinstance(to_id, int):
+                payee = self.get_player_by_local_id(to_id)
+            else:
+                payee = self.get_player_by_name(to_id)
 
         if (payer, payee, amount) not in self.pending_payments:
             self.send_message("That transaction is not a pending payment!")
