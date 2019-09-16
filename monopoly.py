@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from PIL import Image, ImageDraw
+from colorhash import ColorHash
+
 import telegram
 from telegram.error import TelegramError
 
@@ -37,6 +40,7 @@ class Player:
         self.position = 0
         self.user_id = user_id
         self.total_roll = 0
+        self.icon_color = ColorHash(name).rgb
 
     def get_properties(self):
         return self.properties
@@ -125,6 +129,9 @@ class Player:
 
     def sort_props_by_color(self):
         self.properties.sort(key=lambda p: p.get_color())
+
+    def get_icon_color(self):
+        return self.icon_color
 
 
 class Property:
@@ -345,7 +352,19 @@ class Game:
 
         return True
 
+    def update_image_gamestate(self):
+        img = Image.open("monopoly_board.jpg")
+        draw = ImageDraw.Draw(img)
+
+        for p in self.players.values():
+            draw.rectangle((1522, 88 + p.get_id() * 40), (1542, 108 + p.get_id() * 40), fill=p.get_icon_color())
+
     def check_pass_go(self, text, last_total_roll, current_total_roll, player):
+        if player.get_position() == 0 and current_total_roll > 0:
+            self.send_message("You landed on Go and collected $200!")
+            player.add_money(200)
+            return
+
         if last_total_roll // len(self.board) < current_total_roll // len(self.board):
             self.send_message("You " + text + " Go and collected $200!")
             player.add_money(200)
@@ -526,9 +545,10 @@ class Game:
         mortgage_value = property.get_mortgage_value()
         if type(property) == Property:
             mortgage_value += property.get_houses() * property.get_house_cost()
-            mortgage_value += property.get_hotels() * property.get_hotel_cost()
-        property.set_houses(0)
-        property.set_hotels(0)
+            mortgage_value += property.get_hotels() * property.get_hotel_cost() + \
+                              property.get_house_cost() * 4
+            property.set_houses(0)
+            property.set_hotels(0)
 
         player.add_money(mortgage_value)
         property.set_mortgaged(True)
@@ -1244,7 +1264,7 @@ class Game:
             return
 
         if self.board[position] == "Income Tax":
-            self.send_message("You landed on Luxury Tax! Pay $200.")
+            self.send_message("You landed on Income Tax! Pay $200.")
             self.pending_payments.append((player, None, 200))
             return
 
@@ -1261,8 +1281,11 @@ class Game:
                 if property not in player.get_properties():
                     owner = property.get_owner()
                     rent = property.get_rent()
-                    self.send_message("You owe " + owner.get_name() + " $" + str(rent) + ".")
-                    self.pending_payments.append((player, owner, rent))
+                    if not property.get_mortgaged():
+                        self.send_message("You owe " + owner.get_name() + " $" + str(rent) + ".")
+                        self.pending_payments.append((player, owner, rent))
+                    else:
+                        self.send_message("This property is mortgaged!")
                 else:
                     self.send_message("You own this property!")
 
@@ -1320,6 +1343,11 @@ class Game:
         self.ids.remove(self.players[id_1].get_id())
         del self.players[id_1]
         self.turn = self.turn % len(self.players)
+
+        self.pending_trade = None
+        self.pending_payments = None
+        self.has_doubles = False
+        self.last_roll = [-1]
 
         self.send_message("The current player's turn is: " + self.get_player_by_local_id(self.turn).get_name())
 
