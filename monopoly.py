@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Patch 0.9.3
 from __future__ import unicode_literals
 
 from PIL import Image, ImageDraw
@@ -546,7 +547,7 @@ class Game:
         if type(property) == Property:
             mortgage_value += property.get_houses() * property.get_house_cost()
             mortgage_value += property.get_hotels() * property.get_hotel_cost() + \
-                              property.get_house_cost() * 4
+                              property.get_hotels() * property.get_house_cost() * 4
             property.set_houses(0)
             property.set_hotels(0)
 
