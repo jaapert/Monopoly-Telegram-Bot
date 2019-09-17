@@ -1141,7 +1141,7 @@ class Game:
         elif card == 11:
             self.send_message("Chance Card: You've been elected chairman of the board! Pay each player $50.")
             for id in self.players.keys():
-                if id != player.get_id():
+                if id != player.get_user_id():
                     self.pending_payments.append((player, self.players[id], 50))
         elif card == 12:
             self.send_message("Chance Card: Your building loan matures! Recieve $150.")
@@ -1189,7 +1189,7 @@ class Game:
         elif card == 8:
             self.send_message("Community Chest Card: It's your birthday! Collect $10 from each player.")
             for id in self.players.keys():
-                if id != player.get_id():
+                if id != player.get_user_id():
                     self.pending_payments.append((self.players[id], player, 10))
         elif card == 9:
             self.send_message("Community Chest Card: Life insurance matures. Collect $100!")
