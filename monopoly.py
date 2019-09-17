@@ -153,7 +153,7 @@ class Property:
         if self.houses < 4 and self.hotels == 0:
             self.houses += 1
 
-    def sell_house(self):
+    def remove_house(self):
         if self.houses > 0:
             self.houses -= 1
 
@@ -162,7 +162,7 @@ class Property:
             self.houses = 0
             self.hotels = 1
 
-    def sell_hotel(self):
+    def remove_hotel(self):
         if self.hotels > 0:
             self.hotels = 0
             self.houses = 4
@@ -1041,7 +1041,7 @@ class Game:
             return
 
         player.add_money(property.get_hotel_cost())
-        property.sell_hotel()
+        property.remove_hotel()
         self.send_message("You have removed a hotel from " + property.get_name() + "!")
 
     def chance_result(self, player):
