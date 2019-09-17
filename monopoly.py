@@ -711,7 +711,8 @@ class Game:
         for p in self.pending_trade[4]:
             if type(p) == Property:
                 text += p.get_name() + " : " + p.get_color() + \
-                        " (" + str(p.get_houses()) + " houses, " + str(p.get_hotels()) + " hotels)" + \
+                        " (" + str(p.get_houses()) + " houses " + "($" + str(p.get_house_cost()) + "), " + \
+                        str(p.get_hotels()) + " hotels " + "($" + str(p.get_hotel_cost()) + "))" + \
                         " [Mortgage Value: " + str(p.get_mortgage_value()) + "] " + \
                         ("[[Mortgaged]]\n" if p.get_mortgaged() else "\n")
             elif type(p) == OtherProperty:
@@ -723,11 +724,16 @@ class Game:
                           "Money: $" + str(self.pending_trade[3]) + "\n" + "Get Out of Jail Free cards: " + \
                           str(self.pending_trade[7]) + "\n" + "Properties:\n"
         for p in self.pending_trade[5]:
-            text += p.get_name()
             if type(p) == Property:
-                text += " (" + p.get_color() + ")\n"
+                text += p.get_name() + " : " + p.get_color() + \
+                        " (" + str(p.get_houses()) + " houses " + "($" + str(p.get_house_cost()) + "), " + \
+                        str(p.get_hotels()) + " hotels " + "($" + str(p.get_hotel_cost()) + "))" + \
+                        " [Mortgage Value: " + str(p.get_mortgage_value()) + "] " + \
+                        ("[[Mortgaged]]\n" if p.get_mortgaged() else "\n")
             elif type(p) == OtherProperty:
-                text += " (" + p.get_type() + ")\n"
+                text += p.get_name() + " : " + p.get_type() + "\n" + \
+                        " [Mortgage Value: " + str(p.get_mortgage_value()) + "] " + \
+                        ("[[Mortgaged]]\n" if p.get_mortgaged() else "\n")
 
         self.send_message(text)
 
@@ -780,13 +786,32 @@ class Game:
                           "Money: $" + str(self.pending_trade[2]) + "\n" + "Get Out of Jail Free cards: " + \
                           str(self.pending_trade[6]) + "\n" + "Properties:\n"
         for p in self.pending_trade[4]:
-            text += p.get_name() + "\n"
+            if type(p) == Property:
+                text += p.get_name() + " : " + p.get_color() + \
+                        " (" + str(p.get_houses()) + " houses " + "($" + str(p.get_house_cost()) + "), " + \
+                        str(p.get_hotels()) + " hotels " + "($" + str(p.get_hotel_cost()) + "))" + \
+                        " [Mortgage Value: " + str(p.get_mortgage_value()) + "] " + \
+                        ("[[Mortgaged]]\n" if p.get_mortgaged() else "\n")
+            elif type(p) == OtherProperty:
+                text += p.get_name() + " : " + p.get_type() + "\n" + \
+                        " [Mortgage Value: " + str(p.get_mortgage_value()) + "] " + \
+                        ("[[Mortgaged]]\n" if p.get_mortgaged() else "\n")
 
         text += "\nFrom " + self.pending_trade[1].get_name() + ":\n\n" + \
                           "Money: $" + str(self.pending_trade[3]) + "\n" + "Get Out of Jail Free cards: " + \
                           str(self.pending_trade[7]) + "\n" + "Properties:\n"
         for p in self.pending_trade[5]:
-            text += p.get_name() + "\n"
+            if type(p) == Property:
+                text += p.get_name() + " : " + p.get_color() + \
+                        " (" + str(p.get_houses()) + " houses " + "($" + str(p.get_house_cost()) + "), " + \
+                        str(p.get_hotels()) + " hotels " + "($" + str(p.get_hotel_cost()) + "))" + \
+                        " [Mortgage Value: " + str(p.get_mortgage_value()) + "] " + \
+                        ("[[Mortgaged]]\n" if p.get_mortgaged() else "\n")
+            elif type(p) == OtherProperty:
+                text += p.get_name() + " : " + p.get_type() + "\n" + \
+                        " [Mortgage Value: " + str(p.get_mortgage_value()) + "] " + \
+                        ("[[Mortgaged]]\n" if p.get_mortgaged() else "\n")
+
         self.send_message(text)
 
     def agree_to_trade(self, id):
