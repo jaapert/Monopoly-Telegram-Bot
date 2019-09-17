@@ -927,14 +927,14 @@ class Game:
     def purchase_house(self, id, property_id):
         player = self.players.get(id)
 
+        if not self.check_player_existence_and_turn(player):
+            return
+
         if property_id < 0 or property_id >= len(player.get_properties()):
             self.send_message("That is not a property you own.")
             return
 
         property = player.get_property_by_id(property_id)
-
-        if not self.check_player_existence_and_turn(player):
-            return
 
         if property not in player.get_properties():
             self.send_message("You cannot buy a house on a property that isn't yours!")
@@ -972,14 +972,14 @@ class Game:
     def purchase_hotel(self, id, property_id):
         player = self.players.get(id)
 
+        if not self.check_player_existence_and_turn(player):
+            return
+
         if property_id < 0 or property_id >= len(player.get_properties()):
             self.send_message("That is not a property you own.")
             return
 
         property = player.get_property_by_id(property_id)
-
-        if not self.check_player_existence_and_turn(player):
-            return
 
         if property not in player.get_properties():
             self.send_message("You cannot buy a hotel on a property that isn't yours!")
@@ -1004,14 +1004,14 @@ class Game:
     def sell_house(self, id, property_id):
         player = self.players.get(id)
 
+        if not self.check_player_existence_and_turn(player):
+            return
+
         if property_id < 0 or property_id >= len(player.get_properties()):
             self.send_message("That is not a property you own.")
             return
 
         property = player.get_property_by_id(property_id)
-
-        if not self.check_player_existence_and_turn(player):
-            return
 
         if property not in player.get_properties():
             self.send_message("You cannot sell a house on a property that isn't yours!")
@@ -1045,14 +1045,14 @@ class Game:
     def sell_hotel(self, id, property_id):
         player = self.players.get(id)
 
+        if not self.check_player_existence_and_turn(player):
+            return
+
         if property_id < 0 or property_id >= len(player.get_properties()):
             self.send_message("That is not a property you own.")
             return
 
         property = player.get_property_by_id(property_id)
-
-        if not self.check_player_existence_and_turn(player):
-            return
 
         if property not in player.get_properties():
             self.send_message("You cannot sell a hotel on a property that isn't yours!")
@@ -1064,6 +1064,19 @@ class Game:
 
         if property.get_hotels() == 0:
             self.send_message("That property does not have a hotel!")
+            return
+
+        color_count = 0
+        prop_color = property.get_color()
+        for p in player.get_properties():
+            if type(p) == Property and p.get_color() == prop_color:
+                color_count += 1
+
+        if color_count < 2 and (prop_color == "Blue" or prop_color == "Brown"):
+            self.send_message("You do not own the full set of this color property!")
+            return
+        if color_count < 3 and not (prop_color == "Blue" or prop_color == "Brown"):
+            self.send_message("You do not own the full set of this color property!")
             return
 
         player.add_money(property.get_hotel_cost())
