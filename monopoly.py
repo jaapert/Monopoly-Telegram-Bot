@@ -91,7 +91,8 @@ class Player:
         for p in self.properties:
             if type(p) == Property:
                 text += "(" + str(count) + ") " + p.get_name() + " : " + p.get_color() + \
-                        " (" + str(p.get_houses()) + " houses, " + str(p.get_hotels()) + " hotels)" + \
+                        " (" + str(p.get_houses()) + " houses " + "($" + str(p.get_house_cost()) + "), " + \
+                        str(p.get_hotels()) + " hotels " + "($" + str(p.get_hotel_cost()) + "))" + \
                         " [Mortgage Value: " + str(p.get_mortgage_value()) + "] " + \
                         ("[[Mortgaged]]\n" if p.get_mortgaged() else "\n")
             elif type(p) == OtherProperty:
