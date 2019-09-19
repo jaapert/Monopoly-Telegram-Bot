@@ -178,6 +178,9 @@ class Property:
     def get_hotels(self):
         return self.hotels
 
+    def get_base_rent(self):
+        return self.rents[0]
+
     def get_rent(self):
         return self.rents[self.houses + 5 * self.hotels]
 
@@ -531,7 +534,8 @@ class Game:
         player = self.players.get(id)
         property = player.get_property_by_id(prop_id)
 
-        if not self.check_player_existence_and_turn(player):
+        if player is None:
+            self.send_message("You don't seem to exist!")
             return
 
         if property not in player.get_properties():
@@ -887,27 +891,29 @@ class Game:
             self.send_message("You cannot trade more Get Out of Jail free cards than you have!")
             return
 
+        text = ""
+
         if not bankrupt:
             player_1.add_money(-money_from_1)
             player_1.add_money(money_from_2)
-            self.send_message(player_2.get_name() + " has traded $" + str(money_from_2) +
-                              " to " + player_1.get_name() + "!")
+            text += player_2.get_name() + " has traded $" + str(money_from_2) + \
+                              " to " + player_1.get_name() + "!\n"
         player_2.add_money(-money_from_2)
         player_2.add_money(money_from_1)
-        self.send_message(player_1.get_name() + " has traded $" + str(money_from_1) +
-                          " to " + player_2.get_name() + "!")
+        text += player_1.get_name() + " has traded $" + str(money_from_1) + \
+                          " to " + player_2.get_name() + "!\n"
 
         if not bankrupt:
             for p in props_from_2:
                 player_2.remove_property(p)
                 p.set_owner(player_1)
                 player_1.add_property(p)
-                self.send_message(player_2.get_name() + " has traded " + p.get_name() + " to " + player_1.get_name() + "!")
+                text += player_2.get_name() + " has traded " + p.get_name() + " to " + player_1.get_name() + "!\n"
         for p in props_from_1:
             player_1.remove_property(p)
             p.set_owner(player_2)
             player_2.add_property(p)
-            self.send_message(player_1.get_name() + " has traded " + p.get_name() + " to " + player_2.get_name() + "!")
+            text += player_1.get_name() + " has traded " + p.get_name() + " to " + player_2.get_name() + "!\n"
 
         if not bankrupt:
             for i in range(cards_from_2):
@@ -916,14 +922,16 @@ class Game:
             player_2.add_out_free_card()
 
         if not bankrupt:
-            self.send_message(player_2.get_name() + " has traded " + str(cards_from_2) + " cards to " + player_1.get_name() + "!")
-        self.send_message(player_1.get_name() + " has traded " + str(cards_from_1) + " cards to " + player_2.get_name() + "!")
+            text += player_2.get_name() + " has traded " + str(cards_from_2) + " cards to " + player_1.get_name() + "!\n"
+        text += player_1.get_name() + " has traded " + str(cards_from_1) + " cards to " + player_2.get_name() + "!\n"
 
         player_1.sort_props_by_color()
         player_2.sort_props_by_color()
 
         if not bankrupt:
-            self.send_message("The trade has completed!")
+            text += "\nThe trade has completed!\n"
+
+        self.send_message(text)
 
     def purchase_house(self, id, property_id):
         player = self.players.get(id)
@@ -1005,7 +1013,8 @@ class Game:
     def sell_house(self, id, property_id):
         player = self.players.get(id)
 
-        if not self.check_player_existence_and_turn(player):
+        if player is None:
+            self.send_message("You don't seem to exist!")
             return
 
         if property_id < 0 or property_id >= len(player.get_properties()):
@@ -1046,7 +1055,8 @@ class Game:
     def sell_hotel(self, id, property_id):
         player = self.players.get(id)
 
-        if not self.check_player_existence_and_turn(player):
+        if player is None:
+            self.send_message("You don't seem to exist!")
             return
 
         if property_id < 0 or property_id >= len(player.get_properties()):
@@ -1321,6 +1331,18 @@ class Game:
                 if property not in player.get_properties():
                     owner = property.get_owner()
                     rent = property.get_rent()
+
+                    color_count = 0
+                    prop_color = property.get_color()
+                    for p in owner.get_properties():
+                        if type(p) == Property and p.get_color() == prop_color:
+                            color_count += 1
+
+                    if color_count == 2 and (prop_color == "Blue" or prop_color == "Brown"):
+                        rent += property.get_base_rent()
+                    if color_count == 3 and not (prop_color == "Blue" or prop_color == "Brown"):
+                        rent += property.get_base_rent()
+
                     if not property.get_mortgaged():
                         self.send_message("You owe " + owner.get_name() + " $" + str(rent) + ".")
                         self.pending_payments.append((player, owner, rent))

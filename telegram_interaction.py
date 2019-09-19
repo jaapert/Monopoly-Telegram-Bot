@@ -580,12 +580,12 @@ if __name__ == "__main__":
     newgame_aliases = ["newgame"]
     startgame_aliases = ["startgame"]
     endgame_aliases = ["endgame"]
-    roll_aliases = ["roll", "r"]
+    roll_aliases = ["roll", "r", "rol", "oll"]
     bankrupt_aliases = ["bankrupt"]
     purchase_house_aliases = ["purchasehouse", "buyhouse", "bh", "ph"]
     purchase_hotel_aliases = ["purchasehotel", "buyhotel", "bhh", "phh"]
     purchase_property_aliases = ["purchaseproperty", "buyproperty", "buyprop", "purchaseprop", "bp"]
-    end_turn_aliases = ["end", "endturn", "endme"]
+    end_turn_aliases = ["end", "endturn", "endme", "ednme", "edna"]
     pay_aliases = ["pay", "p"]
     get_out_aliases = ["out", "freeme", "usecard", "goofg"]
     bail_aliases = ["bail", "paybail"]
@@ -631,8 +631,8 @@ if __name__ == "__main__":
                 ("setup_trade", 2, setup_trade_aliases),
                 ("assets", 1, assets_aliases),
                 ("blame", 1, blame_aliases),
-                ("sell_house", 2, purchase_house_aliases),
-                ("sell_hotel", 2, purchase_hotel_aliases),
+                ("sell_house", 2, sell_house_aliases),
+                ("sell_hotel", 2, sell_hotel_aliases),
                 ("all_assets", 1, all_assets_aliases)]
     for c in commands:
         func = locals()[c[0] + "_handler"]
