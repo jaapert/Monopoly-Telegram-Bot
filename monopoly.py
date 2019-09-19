@@ -687,11 +687,11 @@ class Game:
                     color_count += 1
                     hh_count += p.get_houses() + p.get_hotels()
 
-            if color_count == 2 and (prop_color == "Dark Blue" or prop_color == "Brown") and hh_count > 0:
+            if color_count == 2 and (prop_color == "Blue" or prop_color == "Brown") and hh_count > 0:
                 self.send_message("You cannot trade a property in a monopoly "
                                   "if any other properties in the monopoly have houses or hotels!")
                 return
-            if color_count == 3 and not (prop_color == "Dark Blue" or prop_color == "Brown") and hh_count > 0:
+            if color_count == 3 and not (prop_color == "Blue" or prop_color == "Brown") and hh_count > 0:
                 self.send_message("You cannot trade a property in a monopoly "
                                   "if any other properties in the monopoly have houses or hotels!")
                 return
@@ -963,10 +963,10 @@ class Game:
             if type(p) == Property and p.get_color() == prop_color:
                 color_count += 1
 
-        if color_count < 2 and (prop_color == "Dark Blue" or prop_color == "Brown"):
+        if color_count < 2 and (prop_color == "Blue" or prop_color == "Brown"):
             self.send_message("You do not own the full set of this color property!")
             return
-        if color_count < 3 and not (prop_color == "Dark Blue" or prop_color == "Brown"):
+        if color_count < 3 and not (prop_color == "Blue" or prop_color == "Brown"):
             self.send_message("You do not own the full set of this color property!")
             return
 
@@ -1132,7 +1132,7 @@ class Game:
 
             self.enact_roll_result(player)
         elif card == 3:
-            self.send_message("Chance Card: Band pays you dividend of $50.")
+            self.send_message("Chance Card: Band pays you a dividend of $50.")
             player.add_money(50)
         elif card == 4:
             self.send_message("Chance Card: You got a Get Out of Jail Free card!")
