@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Patch 0.9.3
+# Patch 0.9.5
 from __future__ import unicode_literals
 
 from PIL import Image, ImageDraw
