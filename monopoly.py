@@ -1406,6 +1406,12 @@ class Game:
         self.pending_trade = (player_1, player_2, player_1.get_money(), 0, player_1.get_properties(), [],
                               player_1.get_get_out_free_cards(), 0, True, True)
         self.trade()
+
+        if len(player_1.get_properties()) > 0:
+            self.pending_trade = (player_1, player_2, player_1.get_money(), 0, player_1.get_properties(), [],
+                                  player_1.get_get_out_free_cards(), 0, True, True)
+            self.trade()
+
         self.send_message(player_1.get_name() + " has bankrupted to " + player_2.get_name() + "!")
 
         self.ids.remove(self.players[id_1].get_id())
