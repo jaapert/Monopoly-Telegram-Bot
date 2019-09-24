@@ -1416,7 +1416,7 @@ class Game:
 
         self.ids.remove(self.players[id_1].get_id())
         del self.players[id_1]
-        self.turn = self.turn % len(self.players)
+        self.turn = self.turn % len(self.players.keys())
 
         self.pending_trade = None
         self.pending_payments = None
