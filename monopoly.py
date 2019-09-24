@@ -600,7 +600,10 @@ class Game:
     # Once both players agree to the trade, it will go through.
     def setup_trade(self, id_1, id_2):
         player_1 = self.players.get(id_1)
-        player_2 = self.get_player_by_local_id(id_2)
+        if id_2.isdigit():
+            player_2 = self.get_player_by_local_id(int(id_2))
+        else:
+            player_2 = self.get_player_by_name(id_2)
 
         if not self.check_player_existence_and_turn(player_1):
             return
@@ -1387,7 +1390,10 @@ class Game:
     def bankrupt(self, id_1, id_2):
         # Player 1 bankrupts to Player 2.
         player_1 = self.players.get(id_1)
-        player_2 = self.get_player_by_local_id(id_2)
+        if id_2.isdigit():
+            player_2 = self.get_player_by_local_id(int(id_2))
+        else:
+            player_2 = self.get_player_by_name(id_2)
 
         if player_1 is None:
             self.send_message("You do not seem to exist!")

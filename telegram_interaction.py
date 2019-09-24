@@ -257,7 +257,7 @@ def bankrupt_handler(bot, update, chat_data, args):
     if not check_game_existence(chat_id, game):
         return
 
-    game.bankrupt(user_id, int(" ".join(args)))
+    game.bankrupt(user_id, " ".join(args))
 
     players = game.get_players()
     if len(players) == 1:
@@ -501,7 +501,7 @@ def setup_trade_handler(bot, update, chat_data, args):
     if not check_game_existence(chat_id, game):
         return
 
-    game.setup_trade(user_id, int(" ".join(args)))
+    game.setup_trade(user_id, " ".join(args))
 
 
 def assets_handler(bot, update, chat_data):
