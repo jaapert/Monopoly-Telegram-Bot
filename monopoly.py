@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Patch 0.9.7
+# Patch 0.9.8
 from __future__ import unicode_literals
 
 from PIL import Image, ImageDraw
@@ -84,6 +84,13 @@ class Player:
                 return p
             count += 1
         return None
+
+    def get_property_by_name(self, name):
+        for p in self.properties:
+            # Check that either the full name was entered or the first word of the name.
+            if p.get_name().lower() == name.lower() or \
+               p.get_name().split()[0].lower() == name.split()[0].lower():
+                return p
 
     def get_properties_str(self):
         text = self.name + " properties:\n\n"
@@ -200,7 +207,6 @@ class Property:
         return self.mortgaged
 
     def set_mortgaged(self, val):
-        # I'll assume for the moment that it's a bool; I need to add a check for that.
         self.mortgaged = val
 
     def get_owner(self):
@@ -254,7 +260,6 @@ class OtherProperty:
         return self.mortgaged
 
     def set_mortgaged(self, val):
-        # I'll assume for the moment that it's a bool; I need to add a check for that.
         self.mortgaged = val
 
     # Not technically accurate, but I need it for sorting.
@@ -499,7 +504,6 @@ class Game:
         self.last_roll = [-1]
         self.has_doubles = False
 
-        #self.send_message(player.get_name() + " has ended their turn.")
         self.send_message(player.get_name() + " has ended their turn. The current player's turn is: " + \
                           self.get_player_by_local_id(self.turn).get_name())
 
@@ -530,65 +534,75 @@ class Game:
 
         self.send_message("You have purchased " + property.get_name() + " for $" + str(property_cost) + "!")
 
-    def mortgage_property(self, id, prop_id):
+    def mortgage_property(self, id, prop_ids):
         player = self.players.get(id)
-        property = player.get_property_by_id(prop_id)
 
         if player is None:
             self.send_message("You don't seem to exist!")
             return
 
-        if property not in player.get_properties():
-            self.send_message("You cannot mortgage a property that isn't yours!")
-            return
+        for prop_id in prop_ids:
+            if prop_id.isdigit():
+                property = player.get_property_by_id(int(prop_id))
+            else:
+                property = player.get_property_by_name(prop_id)
 
-        if property.get_mortgaged():
-            self.send_message("You cannot mortgage a property that's already mortgaged!")
-            return
+            if property not in player.get_properties():
+                self.send_message("You cannot mortgage a property that isn't yours!")
+                continue
 
-        # I'm going to have mortgage property autosell the houses and hotels on the property.
+            if property.get_mortgaged():
+                self.send_message("You cannot mortgage a property that's already mortgaged!")
+                continue
 
-        mortgage_value = property.get_mortgage_value()
-        if type(property) == Property:
-            mortgage_value += property.get_houses() * property.get_house_cost()
-            mortgage_value += property.get_hotels() * property.get_hotel_cost() + \
-                              property.get_hotels() * property.get_house_cost() * 4
-            property.set_houses(0)
-            property.set_hotels(0)
+            # I'm going to have mortgage property autosell the houses and hotels on the property.
 
-        player.add_money(mortgage_value)
-        property.set_mortgaged(True)
-        self.send_message("You have mortgaged " + property.get_name() + " for $" + str(mortgage_value) + "!")
+            mortgage_value = property.get_mortgage_value()
+            if type(property) == Property:
+                mortgage_value += property.get_houses() * property.get_house_cost()
+                mortgage_value += property.get_hotels() * property.get_hotel_cost() + \
+                                  property.get_hotels() * property.get_house_cost() * 4
+                property.set_houses(0)
+                property.set_hotels(0)
+
+            player.add_money(mortgage_value)
+            property.set_mortgaged(True)
+            self.send_message("You have mortgaged " + property.get_name() + " for $" + str(mortgage_value) + "!")
 
 
-    def unmortgage_property(self, id, prop_id):
+    def unmortgage_property(self, id, prop_ids):
         player = self.players.get(id)
-        property = player.get_property_by_id(prop_id)
 
         if not self.check_player_existence_and_turn(player):
             return
 
-        if property not in player.get_properties():
-            self.send_message("You cannot mortgage a property that isn't yours!")
-            return
+        for prop_id in prop_ids:
+            if prop_id.isdigit():
+                property = player.get_property_by_id(int(prop_id))
+            else:
+                property = player.get_property_by_name(prop_id)
 
-        if not property.get_mortgaged():
-            self.send_message("You cannot unmortgage a property that isn't mortgaged!")
-            return
+            if property not in player.get_properties():
+                self.send_message("You cannot mortgage a property (" + str(prop_id) + ") that isn't yours!")
+                continue
 
-        unmortgage_cost = property.get_mortgage_value()
+            if not property.get_mortgaged():
+                self.send_message("You cannot unmortgage a property (" + str(prop_id) + ") that isn't mortgaged!")
+                continue
 
-        if player.get_money() < unmortgage_cost:
-            self.send_message("You don't have enough in money to unmortgage that property!")
-            return
+            unmortgage_cost = property.get_mortgage_value()
 
-        if player.get_total_assets() < unmortgage_cost:
-            self.send_message("You don't even have enough in total assets to unmortgage that property!")
-            return
+            if player.get_money() < unmortgage_cost:
+                self.send_message("You don't have enough in money to unmortgage that property (" + str(prop_id) + ")!")
+                continue
 
-        player.add_money(-unmortgage_cost)
-        property.set_mortgaged(False)
-        self.send_message("You have unmortgaged " + property.get_name() + " for $" + str(unmortgage_cost) + "!")
+            if player.get_total_assets() < unmortgage_cost:
+                self.send_message("You don't even have enough in total assets to unmortgage that property (" + str(prop_id) + ")!")
+                continue
+
+            player.add_money(-unmortgage_cost)
+            property.set_mortgaged(False)
+            self.send_message("You have unmortgaged " + property.get_name() + " for $" + str(unmortgage_cost) + "!")
 
     # This will work as follows:
     # The current turn player will propose a trade -- if one is not in progress.
@@ -936,166 +950,166 @@ class Game:
 
         self.send_message(text)
 
-    def purchase_house(self, id, property_id):
+    def purchase_house(self, id, property_ids):
         player = self.players.get(id)
 
         if not self.check_player_existence_and_turn(player):
             return
 
-        if property_id < 0 or property_id >= len(player.get_properties()):
-            self.send_message("That is not a property you own.")
-            return
+        for property_id in property_ids:
+            if property_id.isdigit():
+                property = player.get_property_by_id(int(property_id))
+            else:
+                property = player.get_property_by_name(property_id)
 
-        property = player.get_property_by_id(property_id)
+            if property not in player.get_properties():
+                self.send_message("You cannot buy a house on a property (" + str(property_id) + ") that isn't yours!")
+                continue
 
-        if property not in player.get_properties():
-            self.send_message("You cannot buy a house on a property that isn't yours!")
-            return
+            if type(property) == OtherProperty:
+                self.send_message("You cannot buy houses on a Railroad or Utility!")
+                continue
 
-        if type(property) == OtherProperty:
-            self.send_message("You cannot buy houses on a Railroad or Utility!")
-            return
+            if property.get_houses() == 4 or property.get_hotels() == 1:
+                self.send_message(property.get_name() + " has the maximium number of houses already!")
+                continue
 
-        if property.get_houses() == 4 or property.get_hotels() == 1:
-            self.send_message("That property has the maximium number of houses already!")
-            return
+            color_count = 0
+            prop_color = property.get_color()
+            for p in player.get_properties():
+                if type(p) == Property and p.get_color() == prop_color:
+                    color_count += 1
 
-        color_count = 0
-        prop_color = property.get_color()
-        for p in player.get_properties():
-            if type(p) == Property and p.get_color() == prop_color:
-                color_count += 1
+            if color_count < 2 and (prop_color == "Blue" or prop_color == "Brown"):
+                self.send_message("You do not own the full set of this color property (" + str(property_id) + ")!")
+                continue
+            if color_count < 3 and not (prop_color == "Blue" or prop_color == "Brown"):
+                self.send_message("You do not own the full set of this color property (" + str(property_id) + ")!")
+                continue
 
-        if color_count < 2 and (prop_color == "Blue" or prop_color == "Brown"):
-            self.send_message("You do not own the full set of this color property!")
-            return
-        if color_count < 3 and not (prop_color == "Blue" or prop_color == "Brown"):
-            self.send_message("You do not own the full set of this color property!")
-            return
+            if player.get_money() < property.get_house_cost():
+                self.send_message("You do not have enough money to afford a house on " + property.get_name() + "!")
+                continue
 
-        if player.get_money() < property.get_house_cost():
-            self.send_message("You do not have enough money to afford a house on that property!")
-            return
+            player.add_money(-property.get_house_cost())
+            property.add_house()
+            self.send_message("You have added a house to " + property.get_name() + "!")
 
-        player.add_money(-property.get_house_cost())
-        property.add_house()
-        self.send_message("You have added a house to " + property.get_name() + "!")
-
-    def purchase_hotel(self, id, property_id):
+    def purchase_hotel(self, id, property_ids):
         player = self.players.get(id)
 
         if not self.check_player_existence_and_turn(player):
             return
 
-        if property_id < 0 or property_id >= len(player.get_properties()):
-            self.send_message("That is not a property you own.")
-            return
+        for property_id in property_ids:
+            if property_id.isdigit():
+                property = player.get_property_by_id(int(property_id))
+            else:
+                property = player.get_property_by_name(property_id)
 
-        property = player.get_property_by_id(property_id)
+            if property not in player.get_properties():
+                self.send_message("You cannot buy a hotel on a property (" + str(property_id) + ") that isn't yours!")
+                continue
 
-        if property not in player.get_properties():
-            self.send_message("You cannot buy a hotel on a property that isn't yours!")
-            return
+            if type(property) == OtherProperty:
+                self.send_message("You cannot buy hotels on a Railroad or Utility!")
+                continue
 
-        if type(property) == OtherProperty:
-            self.send_message("You cannot buy hotels on a Railroad or Utility!")
-            return
+            if property.get_houses() < 4 or property.get_hotels() == 1:
+                self.send_message(property.get_name() + " has too few houses or already has a hotel!")
+                continue
 
-        if property.get_houses() < 4 or property.get_hotels() == 1:
-            self.send_message("That property has too few houses or already has a hotel!")
-            return
+            if player.get_money() < property.get_hotel_cost():
+                self.send_message("You do not have enough money to afford a hotel on " + property.get_name() + "!")
+                continue
 
-        if player.get_money() < property.get_hotel_cost():
-            self.send_message("You do not have enough money to afford a hotel on that property!")
-            return
+            player.add_money(-property.get_hotel_cost())
+            property.add_hotel()
+            self.send_message("You have added a hotel to " + property.get_name() + "!")
 
-        player.add_money(-property.get_hotel_cost())
-        property.add_hotel()
-        self.send_message("You have added a hotel to " + property.get_name() + "!")
-
-    def sell_house(self, id, property_id):
+    def sell_house(self, id, property_ids):
         player = self.players.get(id)
 
         if player is None:
             self.send_message("You don't seem to exist!")
             return
 
-        if property_id < 0 or property_id >= len(player.get_properties()):
-            self.send_message("That is not a property you own.")
-            return
+        for property_id in property_ids:
+            if property_id.isdigit():
+                property = player.get_property_by_id(int(property_id))
+            else:
+                property = player.get_property_by_name(property_id)
 
-        property = player.get_property_by_id(property_id)
+            if property not in player.get_properties():
+                self.send_message("You cannot sell a house on a property (" + str(property_id) + ") that isn't yours!")
+                continue
 
-        if property not in player.get_properties():
-            self.send_message("You cannot sell a house on a property that isn't yours!")
-            return
+            if type(property) == OtherProperty:
+                self.send_message("You cannot sell houses on a Railroad or Utility!")
+                continue
 
-        if type(property) == OtherProperty:
-            self.send_message("You cannot sell houses on a Railroad or Utility!")
-            return
+            if property.get_houses() == 0:
+                self.send_message(property.get_name() + " has no houses!")
+                continue
 
-        if property.get_houses() == 0:
-            self.send_message("That property has no houses!")
-            return
+            color_count = 0
+            prop_color = property.get_color()
+            for p in player.get_properties():
+                if type(p) == Property and p.get_color() == prop_color:
+                    color_count += 1
 
-        color_count = 0
-        prop_color = property.get_color()
-        for p in player.get_properties():
-            if type(p) == Property and p.get_color() == prop_color:
-                color_count += 1
+            if color_count < 2 and (prop_color == "Blue" or prop_color == "Brown"):
+                self.send_message("You do not own the full set of this color property (" + str(property_id) + ")!")
+                continue
+            if color_count < 3 and not (prop_color == "Blue" or prop_color == "Brown"):
+                self.send_message("You do not own the full set of this color property (" + str(property_id) + ")!")
+                continue
 
-        if color_count < 2 and (prop_color == "Blue" or prop_color == "Brown"):
-            self.send_message("You do not own the full set of this color property!")
-            return
-        if color_count < 3 and not (prop_color == "Blue" or prop_color == "Brown"):
-            self.send_message("You do not own the full set of this color property!")
-            return
+            player.add_money(property.get_house_cost())
+            property.remove_house()
+            self.send_message("You have removed a house from " + property.get_name() + "!")
 
-        player.add_money(property.get_house_cost())
-        property.remove_house()
-        self.send_message("You have removed a house from " + property.get_name() + "!")
-
-    def sell_hotel(self, id, property_id):
+    def sell_hotel(self, id, property_ids):
         player = self.players.get(id)
 
         if player is None:
             self.send_message("You don't seem to exist!")
             return
 
-        if property_id < 0 or property_id >= len(player.get_properties()):
-            self.send_message("That is not a property you own.")
-            return
+        for property_id in property_ids:
+            if property_id.isdigit():
+                property = player.get_property_by_id(int(property_id))
+            else:
+                property = player.get_property_by_name(property_id)
 
-        property = player.get_property_by_id(property_id)
+            if property not in player.get_properties():
+                self.send_message("You cannot sell a hotel on a property (" + str(property_id) + ") that isn't yours!")
+                continue
 
-        if property not in player.get_properties():
-            self.send_message("You cannot sell a hotel on a property that isn't yours!")
-            return
+            if type(property) == OtherProperty:
+                self.send_message("You cannot sell hotels on a Railroad or Utility!")
+                continue
 
-        if type(property) == OtherProperty:
-            self.send_message("You cannot sell hotels on a Railroad or Utility!")
-            return
+            if property.get_hotels() == 0:
+                self.send_message(property.get_name() + " does not have a hotel!")
+                continue
 
-        if property.get_hotels() == 0:
-            self.send_message("That property does not have a hotel!")
-            return
+            color_count = 0
+            prop_color = property.get_color()
+            for p in player.get_properties():
+                if type(p) == Property and p.get_color() == prop_color:
+                    color_count += 1
 
-        color_count = 0
-        prop_color = property.get_color()
-        for p in player.get_properties():
-            if type(p) == Property and p.get_color() == prop_color:
-                color_count += 1
+            if color_count < 2 and (prop_color == "Blue" or prop_color == "Brown"):
+                self.send_message("You do not own the full set of this color property (" + str(property_id) + ")!")
+                continue
+            if color_count < 3 and not (prop_color == "Blue" or prop_color == "Brown"):
+                self.send_message("You do not own the full set of this color property (" + str(property_id) + ")!")
+                continue
 
-        if color_count < 2 and (prop_color == "Blue" or prop_color == "Brown"):
-            self.send_message("You do not own the full set of this color property!")
-            return
-        if color_count < 3 and not (prop_color == "Blue" or prop_color == "Brown"):
-            self.send_message("You do not own the full set of this color property!")
-            return
-
-        player.add_money(property.get_hotel_cost())
-        property.remove_hotel()
-        self.send_message("You have removed a hotel from " + property.get_name() + "!")
+            player.add_money(property.get_hotel_cost())
+            property.remove_hotel()
+            self.send_message("You have removed a hotel from " + property.get_name() + "!")
 
     def chance_result(self, player):
         # Due to the difficulty of implementation, I've skipped implementing

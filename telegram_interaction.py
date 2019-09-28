@@ -279,7 +279,7 @@ def purchase_house_handler(bot, update, chat_data, args):
     if not check_game_existence(chat_id, game):
         return
 
-    game.purchase_house(user_id, int(" ".join(args)))
+    game.purchase_house(user_id, args)
 
 
 def purchase_hotel_handler(bot, update, chat_data, args):
@@ -294,7 +294,7 @@ def purchase_hotel_handler(bot, update, chat_data, args):
     if not check_game_existence(chat_id, game):
         return
 
-    game.purchase_hotel(user_id, int(" ".join(args)))
+    game.purchase_hotel(user_id, args)
 
 
 def sell_house_handler(bot, update, chat_data, args):
@@ -309,7 +309,7 @@ def sell_house_handler(bot, update, chat_data, args):
     if not check_game_existence(chat_id, game):
         return
 
-    game.sell_house(user_id, int(" ".join(args)))
+    game.sell_house(user_id, args)
 
 
 def sell_hotel_handler(bot, update, chat_data, args):
@@ -324,7 +324,7 @@ def sell_hotel_handler(bot, update, chat_data, args):
     if not check_game_existence(chat_id, game):
         return
 
-    game.sell_hotel(user_id, int(" ".join(args)))
+    game.sell_hotel(user_id, args)
 
 
 def purchase_property_handler(bot, update, chat_data):
@@ -398,7 +398,7 @@ def mortgage_handler(bot, update, chat_data, args):
     if not check_game_existence(chat_id, game):
         return
 
-    game.mortgage_property(user_id, int(" ".join(args)))
+    game.mortgage_property(user_id, args)
 
 
 def unmortgage_handler(bot, update, chat_data, args):
@@ -413,7 +413,7 @@ def unmortgage_handler(bot, update, chat_data, args):
     if not check_game_existence(chat_id, game):
         return
 
-    game.unmortgage_property(user_id, int(" ".join(args)))
+    game.unmortgage_property(user_id, args)
 
 
 def cancel_trade_handler(bot, update, chat_data):
