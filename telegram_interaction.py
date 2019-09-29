@@ -551,6 +551,12 @@ def all_assets_handler(bot, update, chat_data):
         send_info(bot, chat_id, game, user_id, chat_id)
 
 
+def board_handler(bot, update, chat_data):
+    chat_id = update.message.chat_id
+
+    bot.send_photo(chat_id=chat_id, photo=open("monopoly_board_org.jpg", "rb"))
+
+
 def handle_error(bot, update, error):
     try:
         raise error
@@ -603,6 +609,7 @@ if __name__ == "__main__":
     sell_house_aliases = ["sellhouse", "sh"]
     sell_hotel_aliases = ["sellhotel", "shh"]
     all_assets_aliases = ["allassets", "aa"]
+    board_aliases = ["board", "gameboard", "monopolyboard", "whatdoesitlooklikeagain"]
 
     commands = [("feedback", 0, feedback_aliases),
                 ("newgame", 1, newgame_aliases),
@@ -633,7 +640,8 @@ if __name__ == "__main__":
                 ("blame", 1, blame_aliases),
                 ("sell_house", 2, sell_house_aliases),
                 ("sell_hotel", 2, sell_hotel_aliases),
-                ("all_assets", 1, all_assets_aliases)]
+                ("all_assets", 1, all_assets_aliases),
+                ("board", 1, board_aliases)]
     for c in commands:
         func = locals()[c[0] + "_handler"]
         if c[1] == 0:
