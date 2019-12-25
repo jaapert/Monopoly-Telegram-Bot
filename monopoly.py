@@ -692,7 +692,7 @@ class Game:
                 self.send_message("That property is already in the trade!")
                 return
 
-            if property.get_houses() > 0 or property.get_hotels() > 0:
+            if type(property) == Property and (property.get_houses() > 0 or property.get_hotels() > 0):
                 self.send_message("You cannot trade a property with houses or hotels on it.")
                 return
 
