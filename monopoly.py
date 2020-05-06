@@ -346,8 +346,8 @@ class Game:
 
     def send_message(self, text):
         try:
-            #print(text)
-            bot.send_message(chat_id=self.chat_id, text=text)
+            print(text)
+            #bot.send_message(chat_id=self.chat_id, text=text)
         except TelegramError as e:
             raise e
 
@@ -480,6 +480,7 @@ class Game:
         player = self.players.get(id)
 
         if not self.check_player_existence_and_turn(player):
+            self.send_message("You don't seem to exist!")
             return
 
         if sum(self.last_roll) == -1:
@@ -614,7 +615,7 @@ class Game:
     # Once both players agree to the trade, it will go through.
     def setup_trade(self, id_1, id_2):
         player_1 = self.players.get(id_1)
-        if id_2.isdigit():
+        if str(id_2).isdigit():
             player_2 = self.get_player_by_local_id(int(id_2))
         else:
             player_2 = self.get_player_by_name(id_2)
@@ -1404,7 +1405,7 @@ class Game:
     def bankrupt(self, id_1, id_2):
         # Player 1 bankrupts to Player 2.
         player_1 = self.players.get(id_1)
-        if id_2.isdigit():
+        if str(id_2).isdigit():
             player_2 = self.get_player_by_local_id(int(id_2))
         else:
             player_2 = self.get_player_by_name(id_2)
@@ -1430,7 +1431,7 @@ class Game:
 
         self.ids.remove(self.players[id_1].get_id())
         del self.players[id_1]
-        self.turn = self.turn % len(self.players.keys())
+        self.turn = self.ids[self.turn % len(self.players.keys())]
 
         self.pending_trade = None
         self.pending_payments = None
@@ -1488,7 +1489,7 @@ class Game:
 
 """
 if __name__ == "__main__":
-    players = {"0" : "name", "1" : "name2"}
+    players = {0 : "name0", 1 : "name1", 2 : "name2", 3 : "name3"}
     game = Game("test", players)
-    game.bankrupt("1")
+    game.bankrupt(3, 2)
 """

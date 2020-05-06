@@ -14,7 +14,7 @@ import os
 with open("api_key.txt", 'r') as f:
     TOKEN = f.read().rstrip()
 
-MIN_PLAYERS = 2
+MIN_PLAYERS = 3
 PORT = int(os.environ.get('PORT', '8443'))
 
 
