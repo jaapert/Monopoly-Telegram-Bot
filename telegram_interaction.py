@@ -664,7 +664,7 @@ if __name__ == "__main__":
                 ("all_assets", all_assets_aliases),
                 ("board", board_aliases)]
     for base_name, aliases in commands:
-        func = locals()[c[0] + "_handler"]
+        func = locals()[base_name + "_handler"]
         dispatcher.add_handler(CommandHandler(aliases, func))
     
     # Error handlers
