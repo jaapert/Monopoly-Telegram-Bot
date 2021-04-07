@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Patch 0.9.8
+#!/usr/bin/env python3
 from __future__ import unicode_literals
 
 from PIL import Image, ImageDraw
@@ -10,7 +10,7 @@ from telegram.error import TelegramError
 
 import random
 
-with open("api_key.txt", 'r') as f:
+with open("api_key.txt", 'r', encoding="utf-8") as f:
     TOKEN = f.read().rstrip()
 
 bot = telegram.Bot(token=TOKEN)
@@ -346,8 +346,7 @@ class Game:
 
     def send_message(self, text):
         try:
-            print(text)
-            #bot.send_message(chat_id=self.chat_id, text=text)
+            bot.send_message(chat_id=self.chat_id, text=text)
         except TelegramError as e:
             raise e
 
