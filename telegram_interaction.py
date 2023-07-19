@@ -7,11 +7,9 @@ from telegram.ext import Updater, CommandHandler
 from telegram.error import Unauthorized
 import logging
 
-import os
 import sys
 import traceback
 import logging
-import inspect
 
 import monopoly
 
@@ -19,7 +17,6 @@ with open("api_key.txt", 'r', encoding="utf-8") as f:
     TOKEN = f.read().rstrip()
 
 MIN_PLAYERS = 2
-PORT = int(os.environ.get('PORT', '8443'))
 
 def setup_logger(name, log_file, level=logging.INFO):
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -656,13 +653,9 @@ if __name__ == "__main__":
     for base_name, aliases in commands:
         func = locals()[base_name + "_handler"]
         dispatcher.add_handler(CommandHandler(aliases, func))
-    
+
     # Error handlers
-
     dispatcher.add_error_handler(handle_error)
-
-    #updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
-    #updater.bot.set_webhook("https://la-monopoly-bot.herokuapp.com/" + TOKEN)
 
     updater.start_polling()
     updater.idle()
