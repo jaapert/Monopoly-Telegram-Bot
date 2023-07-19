@@ -23,6 +23,7 @@ Here's a list of helpful commands:
 /freeme will play a Get Out of Jail Free card if you have one.
 /bail will pay your jail bail.
 /mortgage [property_id] will mortgage your property with that ID.
+/unmortgage [property_id] will pay back mortgage on your property with that ID.
 /canceltrade will cancel a pending trade.
 /addtrade [property_id] [money] [num_cards] will add no property (if -1), else the property with that ID, the money, and number of Get Out of Jail Free Cards specified.
 /agree will cause you to agree to the pending trade.
