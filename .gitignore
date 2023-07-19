@@ -1,3 +1,7 @@
 api_key.txt
 feedback.txt
 logging.txt
+.direnv
+error_logs.log
+info_logs.log
+__pycache__

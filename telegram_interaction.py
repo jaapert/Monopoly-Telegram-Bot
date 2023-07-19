@@ -18,7 +18,7 @@ import monopoly
 with open("api_key.txt", 'r', encoding="utf-8") as f:
     TOKEN = f.read().rstrip()
 
-MIN_PLAYERS = 3
+MIN_PLAYERS = 2
 PORT = int(os.environ.get('PORT', '8443'))
 
 def setup_logger(name, log_file, level=logging.INFO):
@@ -36,6 +36,7 @@ ERROR_LOGGER = setup_logger("error_logger", "error_logs.log")
 INFO_LOGGER = setup_logger("info_logger", "info_logs.log")
 
 bot = telegram.Bot(token=TOKEN)
+
 
 def static_handler(command):
     text = open("static_responses/{}.txt".format(command), "r", encoding="utf-8").read()
@@ -97,19 +98,7 @@ def newgame_handler(update, context):
 def is_nickname_valid(name, user_id, context):
     if len(name) < 3 or len(name) > 15:
         return False
-
-    if user_id in context.bot_data.get("pending_players", {}):
-        if name.lower() == context.bot_data["pending_players"][user_id].lower():
-            return True
-
-    for id, user_name in context.bot_data.get("pending_players", {}).items():
-        if name.lower() == user_name.lower():
-            return False
-
-    try:
-        float(name)
-        return False
-    except ValueError as e:
+    else:
         return True
 
 
@@ -210,7 +199,7 @@ def startgame_handler(update, context):
 
     try:
         for user_id, nickname in pending_players.items():
-            bot.send_message(chat_id=user_id, text="Trying to start game!", encoding="utf-8")
+            bot.send_message(chat_id=user_id, text="Trying to start game!")
     except Unauthorized as u:
         text = open("static_responses/start_game_failure.txt", "r", encoding="utf-8").read()
         bot.send_message(chat_id=chat_id, text=text)
