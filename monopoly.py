@@ -1485,6 +1485,19 @@ class Game:
             self.check_pass_go("passed", last_total_roll, current_total_roll, player)
 
             self.enact_roll_result(player)
+            # trigger autopay if pending payment higher than 0
+            if len(self.pending_payments) > 0 :
+                for pendingpay in self.pending_payments:
+                    from_id, to_id, amount=pendingpay
+                    # if user id is not none get real user id
+                    if from_id != None:
+                        from_id=from_id.get_user_id()
+                    if to_id != None:
+                        # pay function expects a numberstring so format it that way
+                        to_id=str(to_id.get_id())
+                    # trust pay to handle sufficient fund check
+                    self.pay( from_id, to_id, amount)
+
 
 """
 if __name__ == "__main__":
