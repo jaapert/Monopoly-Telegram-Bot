@@ -284,45 +284,45 @@ class Game:
         self.board = \
         [
             "Go",
-            Property("Mediterranean Avenue", "Brown", 60, [2, 10, 30, 90, 160, 250], 30, 50, 50),
+            Property("Mediterranean Avenue", "Brown 🟫", 60, [2, 10, 30, 90, 160, 250], 30, 50, 50),
             "Community Chest",
-            Property("Baltic Avenue", "Brown", 60, [4, 20, 60, 180, 320, 450], 30, 50, 50),
+            Property("Baltic Avenue", "Brown 🟫", 60, [4, 20, 60, 180, 320, 450], 30, 50, 50),
             "Income Tax",
             OtherProperty("Reading Railroad", 200, 25, 100, "Railroad"),
-            Property("Oriental Avenue", "Light Blue", 100, [6, 30, 90, 270, 400, 550], 50, 50, 50),
+            Property("Oriental Avenue", "Light Blue ⬜️", 100, [6, 30, 90, 270, 400, 550], 50, 50, 50),
             "Chance",
-            Property("Vermont Avenue", "Light Blue", 100, [6, 30, 90, 270, 400, 550], 50, 50, 50),
-            Property("Connecticut Avenue", "Light Blue", 120, [8, 40, 100, 300, 450, 600], 60, 50, 50),
+            Property("Vermont Avenue", "Light Blue ⬜️", 100, [6, 30, 90, 270, 400, 550], 50, 50, 50),
+            Property("Connecticut Avenue", "Light Blue ⬜️", 120, [8, 40, 100, 300, 450, 600], 60, 50, 50),
             "Jail",
-            Property("St. Charles Place", "Pink", 140, [10, 50, 150, 450, 625, 750], 70, 100, 100),
+            Property("St. Charles Place", "Pink 🟪", 140, [10, 50, 150, 450, 625, 750], 70, 100, 100),
             OtherProperty("Electric Company", 150, 1, 75, "Utility"),
-            Property("States Avenue", "Pink", 140, [10, 50, 150, 450, 625, 750], 70, 100, 100),
-            Property("Virginia Avenue", "Pink", 160, [12, 60, 180, 500, 700, 900], 80, 100, 100),
+            Property("States Avenue", "Pink 🟪", 140, [10, 50, 150, 450, 625, 750], 70, 100, 100),
+            Property("Virginia Avenue", "Pink 🟪", 160, [12, 60, 180, 500, 700, 900], 80, 100, 100),
             OtherProperty("Pennsylvania Railroad", 200, 25, 100, "Railroad"),
-            Property("St. James Place", "Orange", 180, [14, 70, 200, 550, 750, 950], 90, 100, 100),
+            Property("St. James Place", "Orange 🟧", 180, [14, 70, 200, 550, 750, 950], 90, 100, 100),
             "Community Chest",
-            Property("Tennessee Avenue", "Orange", 180, [14, 70, 200, 550, 750, 950], 90, 100, 100),
-            Property("New York Avenue", "Orange", 200, [16, 80, 220, 600, 800, 1000], 100, 100, 100),
+            Property("Tennessee Avenue", "Orange 🟧", 180, [14, 70, 200, 550, 750, 950], 90, 100, 100),
+            Property("New York Avenue", "Orange 🟧", 200, [16, 80, 220, 600, 800, 1000], 100, 100, 100),
             "Free Parking",
-            Property("Kentucky Avenue", "Red", 220, [18, 90, 250, 700, 875, 1050], 110, 150, 150),
+            Property("Kentucky Avenue", "Red 🟥", 220, [18, 90, 250, 700, 875, 1050], 110, 150, 150),
             "Chance",
-            Property("Indiana Avenue", "Red", 220, [18, 90, 250, 700, 875, 1050], 110, 150, 150),
-            Property("Illinois Avenue", "Red", 240, [20, 100, 300, 750, 925, 1100], 120, 150, 150),
+            Property("Indiana Avenue", "Red 🟥", 220, [18, 90, 250, 700, 875, 1050], 110, 150, 150),
+            Property("Illinois Avenue", "Red 🟥", 240, [20, 100, 300, 750, 925, 1100], 120, 150, 150),
             OtherProperty("B. & O. Railroad", 200, 25, 100, "Railroad"),
-            Property("Atlantic Avenue", "Yellow", 260, [22, 110, 330, 800, 975, 1150], 130, 150, 150),
-            Property("Ventnor Avenue", "Yellow", 260, [22, 110, 330, 800, 975, 1150], 130, 150, 150),
+            Property("Atlantic Avenue", "Yellow 🟨", 260, [22, 110, 330, 800, 975, 1150], 130, 150, 150),
+            Property("Ventnor Avenue", "Yellow 🟨", 260, [22, 110, 330, 800, 975, 1150], 130, 150, 150),
             OtherProperty("Water Works", 150, 1, 75, "Utility"),
-            Property("Marvin Gardens", "Yellow", 280, [24, 120, 360, 850, 1025, 1200], 140, 150, 150),
+            Property("Marvin Gardens", "Yellow 🟨", 280, [24, 120, 360, 850, 1025, 1200], 140, 150, 150),
             "Go To Jail",
-            Property("Pacific Avenue", "Green", 300, [26, 130, 390, 900, 1100, 1275], 150, 200, 200),
-            Property("North Carolina Avenue", "Green", 300, [26, 130, 390, 900, 1100, 1275], 150, 200, 200),
+            Property("Pacific Avenue", "Green 🟩", 300, [26, 130, 390, 900, 1100, 1275], 150, 200, 200),
+            Property("North Carolina Avenue", "Green 🟩", 300, [26, 130, 390, 900, 1100, 1275], 150, 200, 200),
             "Community Chest",
-            Property("Pennsylvania Avenue", "Green", 320, [28, 150, 450, 1000, 1200, 1400], 160, 200, 200),
+            Property("Pennsylvania Avenue", "Green 🟩", 320, [28, 150, 450, 1000, 1200, 1400], 160, 200, 200),
             OtherProperty("Short Line", 200, 25, 100, "Railroad"),
             "Chance",
-            Property("Park Place", "Blue", 350, [35, 175, 500, 1100, 1300, 1500], 175, 200, 200),
+            Property("Park Place", "Blue 🟦", 350, [35, 175, 500, 1100, 1300, 1500], 175, 200, 200),
             "Luxury Tax",
-            Property("Boardwalk", "Blue", 400, [50, 200, 600, 1400, 1700, 2000], 200, 200, 200)
+            Property("Boardwalk", "Blue 🟦", 400, [50, 200, 600, 1400, 1700, 2000], 200, 200, 200)
         ]
         # Somewhat ugly, but I need the reference to the object not a copy.
         self.available_properties = list(filter(lambda x: x is not None,
@@ -704,11 +704,11 @@ class Game:
                     color_count += 1
                     hh_count += p.get_houses() + p.get_hotels()
 
-            if color_count == 2 and (prop_color == "Blue" or prop_color == "Brown") and hh_count > 0:
+            if color_count == 2 and (prop_color == "Blue 🟦" or prop_color == "Brown 🟫") and hh_count > 0:
                 self.send_message("You cannot trade a property in a monopoly "
                                   "if any other properties in the monopoly have houses or hotels!")
                 return
-            if color_count == 3 and not (prop_color == "Blue" or prop_color == "Brown") and hh_count > 0:
+            if color_count == 3 and not (prop_color == "Blue 🟦" or prop_color == "Brown 🟫") and hh_count > 0:
                 self.send_message("You cannot trade a property in a monopoly "
                                   "if any other properties in the monopoly have houses or hotels!")
                 return
@@ -980,10 +980,10 @@ class Game:
                 if type(p) == Property and p.get_color() == prop_color:
                     color_count += 1
 
-            if color_count < 2 and (prop_color == "Blue" or prop_color == "Brown"):
+            if color_count < 2 and (prop_color == "Blue 🟦" or prop_color == "Brown 🟫"):
                 self.send_message("You do not own the full set of this color property (" + str(property_id) + ")!")
                 continue
-            if color_count < 3 and not (prop_color == "Blue" or prop_color == "Brown"):
+            if color_count < 3 and not (prop_color == "Blue 🟦" or prop_color == "Brown 🟫"):
                 self.send_message("You do not own the full set of this color property (" + str(property_id) + ")!")
                 continue
 
@@ -1058,10 +1058,10 @@ class Game:
                 if type(p) == Property and p.get_color() == prop_color:
                     color_count += 1
 
-            if color_count < 2 and (prop_color == "Blue" or prop_color == "Brown"):
+            if color_count < 2 and (prop_color == "Blue 🟦" or prop_color == "Brown 🟫"):
                 self.send_message("You do not own the full set of this color property (" + str(property_id) + ")!")
                 continue
-            if color_count < 3 and not (prop_color == "Blue" or prop_color == "Brown"):
+            if color_count < 3 and not (prop_color == "Blue 🟦" or prop_color == "Brown 🟫"):
                 self.send_message("You do not own the full set of this color property (" + str(property_id) + ")!")
                 continue
 
@@ -1100,10 +1100,10 @@ class Game:
                 if type(p) == Property and p.get_color() == prop_color:
                     color_count += 1
 
-            if color_count < 2 and (prop_color == "Blue" or prop_color == "Brown"):
+            if color_count < 2 and (prop_color == "Blue 🟦" or prop_color == "Brown 🟫"):
                 self.send_message("You do not own the full set of this color property (" + str(property_id) + ")!")
                 continue
-            if color_count < 3 and not (prop_color == "Blue" or prop_color == "Brown"):
+            if color_count < 3 and not (prop_color == "Blue 🟦" or prop_color == "Brown 🟫"):
                 self.send_message("You do not own the full set of this color property (" + str(property_id) + ")!")
                 continue
 
@@ -1355,9 +1355,9 @@ class Game:
                         if type(p) == Property and p.get_color() == prop_color:
                             color_count += 1
 
-                    if color_count == 2 and (prop_color == "Blue" or prop_color == "Brown"):
+                    if color_count == 2 and (prop_color == "Blue 🟦" or prop_color == "Brown 🟫"):
                         rent += property.get_base_rent()
-                    if color_count == 3 and not (prop_color == "Blue" or prop_color == "Brown"):
+                    if color_count == 3 and not (prop_color == "Blue 🟦" or prop_color == "Brown 🟫"):
                         rent += property.get_base_rent()
 
                     if not property.get_mortgaged():
