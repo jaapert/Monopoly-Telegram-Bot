@@ -5,3 +5,4 @@ logging.txt
 error_logs.log
 info_logs.log
 __pycache__
+.vscode
