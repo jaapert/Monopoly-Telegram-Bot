@@ -1,7 +1,0 @@
-Hello! This bot was made to let people play Monopoly in Telegram. In order to use me, you'll need to add me to a chat and have everyone who wishes to play directly message me (t.me/LA_Monopoly_Game_Bot).
-
-Commands:
-
-/newgame - Begins a new game of Monopoly.
-/rules - Sends a message with the rules of Monopoly.
-/help - Sends a message with additional commands and information.
