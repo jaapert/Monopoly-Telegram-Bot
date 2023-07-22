@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 import telegram
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Updater, CommandHandler, PicklePersistence
 from telegram.error import Unauthorized
 import logging
 
@@ -573,7 +573,8 @@ def handle_error(update, context):
 
 if __name__ == "__main__":
     # Set up the bot
-    updater = Updater(token=TOKEN)
+    persistence = PicklePersistence(filename='persistent_bot_state.pkl')
+    updater = Updater(token=TOKEN, persistence=persistence)
     dispatcher = updater.dispatcher
 
     # Static command handlers
