@@ -99,7 +99,7 @@ def newgame_handler(update, context):
 
 
 def is_nickname_valid(name, user_id, context):
-    if len(name) < 3 or len(name) > 15:
+    if len(name) < 1 or len(name) > 15:
         return False
     else:
         return True
