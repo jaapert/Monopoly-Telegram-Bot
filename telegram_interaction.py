@@ -388,6 +388,16 @@ def bail_handler(update, context):
     game.pay_bail(user_id)
 
 
+def money_handler(update, context):
+    chat_id = update.message.chat.id
+    user_id = update.message.from_user.id
+    game = context.bot_data.get("game_obj")
+    player = game.players.get(user_id)
+    playername=player.get_name()
+    money = player.get_money()
+    bot.send_message(chat_id=chat_id, text="{playername}\'s current funds: ${money}".format(playername=playername, money=money))
+
+
 def mortgage_handler(update, context):
     chat_id = update.message.chat.id
     user_id = update.message.from_user.id
@@ -601,6 +611,7 @@ if __name__ == "__main__":
     pay_aliases = ["pay", "p"]
     get_out_aliases = ["out", "freeme", "usecard", "goofg"]
     bail_aliases = ["bail", "paybail"]
+    money_aliases=["showmethemoney","money","funds"]
     mortgage_aliases = ["mortgage", "m"]
     unmortgage_aliases = ["unmortgage", "um"]
     cancel_trade_aliases = ["canceltrade", "ct"]
@@ -633,6 +644,7 @@ if __name__ == "__main__":
                 ("pay", pay_aliases),
                 ("get_out_of_jail_free", get_out_aliases),
                 ("bail", bail_aliases),
+                ("money",money_aliases),
                 ("mortgage", mortgage_aliases),
                 ("unmortgage", unmortgage_aliases),
                 ("cancel_trade", cancel_trade_aliases),
