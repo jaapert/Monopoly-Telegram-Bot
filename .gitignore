@@ -7,3 +7,4 @@ info_logs.log
 __pycache__
 .vscode
 persistent_bot_state.pkl
+*.sw?
