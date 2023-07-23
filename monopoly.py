@@ -2,6 +2,8 @@
 #!/usr/bin/env python3
 from __future__ import unicode_literals
 
+from typing import Dict, List, Optional
+
 from PIL import Image, ImageDraw
 from colorhash import ColorHash
 
@@ -34,6 +36,9 @@ class Player:
         self.user_id = user_id
         self.total_roll = 0
         self.icon_color = ColorHash(name).rgb
+
+    def __repr__(self):
+        return f"Player: {self.name}[{self.id}] ${self.money} @{self.position}"
 
     def get_properties(self):
         return self.properties
@@ -134,6 +139,32 @@ class Player:
     def get_icon_color(self):
         return self.icon_color
 
+    def is_bank(self) -> bool:
+        return False
+
+    def __eq__(self, other):
+        if isinstance(other, Player):
+            return self.name == other.name and self.user_id == other.user_id
+        return False
+
+
+class Bank:
+    """hack to support matching players to bank"""
+    def __init__(self):
+        self.name = 'bank'
+        self.id = 'bank'
+
+    def is_bank(self) -> bool:
+        return True
+
+    def get_name(self):
+        return self.name
+
+    def __repr__(self):
+        return "Bank"
+
+    def __eq__(self, other):
+        return isinstance(other, Bank)
 
 class Property:
     # Note: rents is [base_rent, one_house_rent, ..., four_houses_rent, hotel_rent]
@@ -261,7 +292,7 @@ class OtherProperty:
 
 class Game:
     def __init__(self, chat_id, players, bot):
-        self.players = {}
+        self.players: Dict[int, Player] = {}
         self.bot = bot
         self.chat_id = chat_id
         self.turn = 0
@@ -371,13 +402,13 @@ class Game:
             self.send_message("You " + text + " Go and collected $200!")
             player.add_money(200)
 
-    def get_player_by_local_id(self, id):
+    def get_player_by_local_id(self, id) -> Optional[Player]:
         for p in self.players.values():
             if p.get_id() == id:
                 return p
         return None
 
-    def get_player_by_name(self, name):
+    def get_player_by_name(self, name) -> Optional[Player]:
         for p in self.players.values():
             if p.get_name().lower() == name.lower():
                 return p
@@ -1397,7 +1428,10 @@ class Game:
     def bankrupt(self, id_1, id_2):
         # Player 1 bankrupts to Player 2.
         player_1 = self.players.get(id_1)
-        if str(id_2).isdigit():
+
+        if id_2 == 'bank':
+            player_2 = Bank()
+        elif str(id_2).isdigit():
             player_2 = self.get_player_by_local_id(int(id_2))
         else:
             player_2 = self.get_player_by_name(id_2)
@@ -1410,19 +1444,44 @@ class Game:
             self.send_message("The other player does not seem to exist!")
             return
 
-        self.pending_trade = (player_1, player_2, player_1.get_money(), 0, player_1.get_properties(), [],
-                              player_1.get_get_out_free_cards(), 0, True, True)
-        self.trade()
+        if len(self.pending_payments) >= 2:
+            if player_2.is_bank():
+                self.send_message("Payments pending to multiple people, can only bankrupt to bank")
+                return
+        elif len(self.pending_payments) == 1:
+            _, who, amount = self.pending_payments[0]
+            
+            if who == None:  # bank? wtf is this code m8
+                who = Bank()
+            else:
+                who = self.get_player_by_local_id(who)
 
-        if len(player_1.get_properties()) > 0:
+            if player_2 != who:
+                self.send_message(f"You still have a payment of {amount} pending to {who.name}, you can only bankrupt to them")
+                return
+
+        if player_2.is_bank():
+            for prop in player_1.get_properties():
+                prop.set_owner(None)
+                self.available_properties.append(prop)
+        else:
+            # Hack. If we're 500 in debt (so money=-500), we do not want to trade the -500, that would cost the other party
+            # the trade function blocks if trade more than you have, so we hack it here by setting the minimum a user has to 0
+            player_1.money = max(0, player_1.get_money())
+            
+            name = player_2.get_name()
             self.pending_trade = (player_1, player_2, player_1.get_money(), 0, player_1.get_properties(), [],
                                   player_1.get_get_out_free_cards(), 0, True, True)
             self.trade()
+            if len(player_1.get_properties()) > 0:
+                self.pending_trade = (player_1, player_2, player_1.get_money(), 0, player_1.get_properties(), [],
+                                      player_1.get_get_out_free_cards(), 0, True, True)
+                self.trade()
 
         self.send_message(player_1.get_name() + " has bankrupted to " + player_2.get_name() + "!")
 
         self.ids.remove(self.players[id_1].get_id())
-        del self.players[id_1]
+        self.players.pop(id_1)
         self.turn = self.ids[self.turn % len(self.players.keys())]
 
         self.pending_trade = None
