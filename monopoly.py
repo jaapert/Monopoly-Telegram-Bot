@@ -5,15 +5,7 @@ from __future__ import unicode_literals
 from PIL import Image, ImageDraw
 from colorhash import ColorHash
 
-import telegram
-from telegram.error import TelegramError
-
 import random
-
-with open("api_key.txt", 'r', encoding="utf-8") as f:
-    TOKEN = f.read().rstrip()
-
-bot = telegram.Bot(token=TOKEN)
 
 class Dice:
     def __init__(self, dice_count, sides):
@@ -1497,6 +1489,18 @@ class Game:
                         to_id=str(to_id.get_id())
                     # trust pay to handle sufficient fund check
                     self.pay( from_id, to_id, amount)
+
+
+
+def create_bot():
+    import telegram
+    from telegram.error import TelegramError
+
+    with open("api_key.txt", 'r', encoding="utf-8") as f:
+        TOKEN = f.read().rstrip()
+
+    bot = telegram.Bot(token=TOKEN)
+    return bot
 
 
 """
