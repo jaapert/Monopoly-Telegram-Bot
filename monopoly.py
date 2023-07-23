@@ -1433,7 +1433,7 @@ class Game:
         self.turn = self.ids[self.turn % len(self.players.keys())]
 
         self.pending_trade = None
-        self.pending_payments = None
+        self.pending_payments.clear()
         self.has_doubles = False
         self.last_roll = [-1]
 
