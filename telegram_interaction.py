@@ -203,7 +203,7 @@ def startgame_handler(update, context):
         return
 
     context.bot_data["is_game_pending"] = False
-    context.bot_data["game_obj"] = monopoly.Game(chat_id, pending_players)
+    context.bot_data["game_obj"] = monopoly.Game(chat_id, pending_players, bot)
     game = context.bot_data.get("game_obj")
     send_infos(bot, chat_id, game, pending_players)
 
