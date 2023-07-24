@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "monopoly-telegram-bot"
+version = "0.1.0"
+description = "Telegram monopoly game"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "monopoly_telegram_bot"}]
+
+[tool.poetry.dependencies]
+python = ">=3.8 <4.0"
+pillow = "^10.0.0"
+colorhash = "^1.2.1"
+python-telegram-bot = "<=13.10"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+ruff = "^0.0.280"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
