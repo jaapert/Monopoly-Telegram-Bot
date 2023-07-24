@@ -12,6 +12,7 @@ pillow = "^10.0.0"
 colorhash = "^1.2.1"
 python-telegram-bot = "<=13.10"
 mock = "^5.1.0"
+prettytable = "^3.8.0"
 
 
 [tool.poetry.group.dev.dependencies]

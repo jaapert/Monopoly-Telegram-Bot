@@ -64,7 +64,8 @@ def check_game_existence(chat_id, game):
 
 def send_info(bot, chat_id, game, user_id, send_id):
     player = game.players.get(user_id)
-    props = player.get_properties_str()
+    props = f"```\n{player.get_properties_str()}\n```"
+    props = props + "Note: Table doesn't account for Monop, railroad & utility scaling\n"
     money = player.get_money()
     cards = player.get_get_out_free_cards()
     total_assets = player.get_total_assets()
