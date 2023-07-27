@@ -349,6 +349,7 @@ def end_turn_handler(update, context):
         return
 
     game.end_turn(user_id)
+    blame_handler(update, context)
 
 
 def pay_handler(update, context):
