@@ -528,8 +528,15 @@ class Game:
         self.last_roll = [-1]
         self.has_doubles = False
 
-        self.send_message(player.get_name() + " has ended their turn. The current player's turn is: " + \
-                          self.get_player_by_local_id(self.turn).get_name())
+        current_pos = self.board[player.get_position()]
+        if isinstance(current_pos, Property) or isinstance(current_pos, OtherProperty):
+            current_pos = f"{current_pos.get_name()} [{current_pos.get_color()}]"
+
+        msg = (
+                f"{player.get_name()} has ended their turn. "
+                f"Next up: {self.get_player_by_local_id(self.turn).get_name()} @ {current_pos}"
+        )
+        self.send_message(msg)
 
     # I need to be careful about making sure the objects aren't copied.
     # I need the original objects to be passed around.
