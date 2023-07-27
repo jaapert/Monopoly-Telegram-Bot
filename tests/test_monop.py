@@ -71,16 +71,13 @@ def game(nplayers=5):
 
 def test_endturn(game):
     p0 = game.get_players()[0]
+    p1 = game.get_players()[1]
+    p1.set_position(9)
+
     p0.set_position(2)
     game.last_roll = [1,1]
     game.end_turn(p0.id)
-    assert game.match_message(r"testplayer_0 has ended their turn. Next up: testplayer_1 @ Community Chest")
-
-    p1 = game.get_players()[1]
-    p1.set_position(9)
-    game.last_roll = [5,3]
-    game.end_turn(p1.id)
-    assert game.match_message(r"testplayer_1 has ended their turn. Next up: testplayer_2 @ Connecticut Avenue \[Light Blue")
+    assert game.match_message(r"testplayer_0 has ended their turn. Next up: testplayer_1 @ Connecticut Avenue \[Light")
 
 
 def test_bankrupt_to_other_user_in_debt(game):

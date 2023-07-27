@@ -540,7 +540,7 @@ class Game:
         self.last_roll = [-1]
         self.has_doubles = False
 
-        current_pos = self.board[player.get_position()]
+        current_pos = self.board[self.get_player_by_local_id(self.turn).get_position()]
         if isinstance(current_pos, Property) or isinstance(current_pos, OtherProperty):
             current_pos = f"{current_pos.get_name()} [{current_pos.get_color()}]"
 
