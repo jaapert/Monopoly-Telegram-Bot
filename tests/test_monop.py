@@ -162,3 +162,21 @@ def test_bankrupt_bankr(game):
     assert properties[1].owner == None
 
 
+def test_asset_printer(game, capsys):
+    p0 = game.get_players()[0]
+
+    prop_pos = [1,3,5,6,8,9, 15]
+    for pos in prop_pos:
+        p0.set_position(pos)
+        game.purchase_property(p0.id)
+    game.clear_messages()
+    assert len(p0.get_properties()) == len(prop_pos)
+    p0.get_properties()[2].hotels = 1
+    p0.get_properties()[3].houses = 4
+    p0.get_properties()[4].houses = 4
+
+    ps = p0.get_properties_str()
+    with capsys.disabled():
+        print(ps)
+
+

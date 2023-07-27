@@ -3,11 +3,11 @@
 from __future__ import unicode_literals
 
 from typing import Dict, List, Optional
+import random
 
 from PIL import Image, ImageDraw
 from colorhash import ColorHash
-
-import random
+import prettytable
 
 class Dice:
     def __init__(self, dice_count, sides):
@@ -90,21 +90,32 @@ class Player:
                 return p
 
     def get_properties_str(self):
-        text = self.name + " properties:\n\n"
-        count = 0
-        for p in self.properties:
+        table = prettytable.PrettyTable()
+        table.field_names = ["id", "name", "color", "price", "mort", "#", "rent"]
+        for (id, p) in enumerate(self.properties):
+            is_mort = "Y" if p.get_mortgaged() else "N"
+
             if type(p) == Property:
-                text += "(" + str(count) + ") " + p.get_name() + " : " + p.get_color() + \
-                        " (" + str(p.get_houses()) + " houses " + "($" + str(p.get_house_cost()) + "), " + \
-                        str(p.get_hotels()) + " hotels " + "($" + str(p.get_hotel_cost()) + "))" + \
-                        " [Mortgage Value: " + str(p.get_mortgage_value()) + "] " + \
-                        ("[[Mortgaged]]\n" if p.get_mortgaged() else "\n")
+                table.add_row([
+                    id,
+                    p.get_name(),
+                    p.get_color(),
+                    p.cost,
+                    f"{is_mort} ({p.get_mortgage_value()})",
+                    "H" if p.get_hotels() > 0 else str(p.get_houses()),
+                    p.get_rent(),
+                ])
             elif type(p) == OtherProperty:
-                text += "(" + str(count) + ") " + p.get_name() + " : " + p.get_type() + \
-                        " [Mortgage Value: " + str(p.get_mortgage_value()) + "] " + \
-                        ("[[Mortgaged]]\n" if p.get_mortgaged() else "\n")
-            count += 1
-        return text
+                table.add_row([
+                    id,
+                    p.get_name(),
+                    p.get_type(),
+                    p.cost,
+                    f"{is_mort} ({p.get_mortgage_value()})",
+                    '',
+                    p.get_rent(),
+                ])
+        return self.name + " properties:\n\n" + table.get_string()
 
     def get_position(self):
         return self.position
@@ -180,6 +191,7 @@ class Property:
         self.cost = cost
         self.mortgaged = False
         self.owner = None
+
 
     def add_house(self):
         if self.houses < 4 and self.hotels == 0:
