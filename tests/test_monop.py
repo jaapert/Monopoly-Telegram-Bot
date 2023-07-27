@@ -49,6 +49,10 @@ class FakeGame(Game):
         print(m)
         return bool(re.search(pattern, m))
 
+    def print_messages(self):
+        for msg in self._msgs:
+            print(msg)
+
 
 @pytest.fixture
 def bot():
@@ -63,6 +67,20 @@ def game(nplayers=5):
     game = FakeGame("aaa", players, bot)
     game._msgs.clear()
     return game
+
+
+def test_endturn(game):
+    p0 = game.get_players()[0]
+    p0.set_position(2)
+    game.last_roll = [1,1]
+    game.end_turn(p0.id)
+    assert game.match_message(r"testplayer_0 has ended their turn. Next up: testplayer_1 @ Community Chest")
+
+    p1 = game.get_players()[1]
+    p1.set_position(9)
+    game.last_roll = [5,3]
+    game.end_turn(p1.id)
+    assert game.match_message(r"testplayer_1 has ended their turn. Next up: testplayer_2 @ Connecticut Avenue \[Light Blue")
 
 
 def test_bankrupt_to_other_user_in_debt(game):
