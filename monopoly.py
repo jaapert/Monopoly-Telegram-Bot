@@ -1414,6 +1414,9 @@ class Game:
         if type(self.board[position]) == OtherProperty:
             property = self.board[position]
             self.send_message("You landed on " + property.get_name() + "!")
+            if property.morgaged:
+                self.send_message("This property is mortgaged!")
+                return
 
             if property in self.available_properties:
                 self.send_message("This property is available! You can buy " + \
@@ -1426,7 +1429,7 @@ class Game:
                     if property.get_type() == "Railroad":
                         num_railroads = 0
                         for p in owner.get_properties():
-                            if type(p) == OtherProperty and p.get_type() == "Railroad":
+                            if type(p) == OtherProperty and p.get_type() == "Railroad" and not p.mortgaged:
                                 num_railroads += 1
                         final_rent = rent * 2 ** (num_railroads - 1)
                         self.send_message("You owe " + owner.get_name() + " $" + str(final_rent) + ".")
@@ -1434,7 +1437,7 @@ class Game:
                     elif property.get_type() == "Utility":
                         num_utils = 0
                         for p in owner.get_properties():
-                            if type(p) == OtherProperty and p.get_type() == "Utility":
+                            if type(p) == OtherProperty and p.get_type() == "Utility" and not p.mortgaged:
                                 num_utils += 1
                         rent = 10 * sum(self.last_roll) if num_utils == 2 else 4 * sum(self.last_roll)
                         self.send_message("You owe " + owner.get_name() + " $" + str(rent) + ".")
