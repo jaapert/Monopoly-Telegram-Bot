@@ -97,6 +97,7 @@ def test_bankrupt_to_other_user_in_debt(game):
     assert len(p0.get_properties()) == 2
 
     p0.money = -500
+    p0.add_out_free_card()
 
     game.pending_payments.append((p0, p1, 500))
 
@@ -114,10 +115,12 @@ def test_bankrupt_to_other_user_in_debt(game):
     assert len(p0.get_properties()) == 2
 
     assert len(p1.get_properties()) == 0  # target has no properties now
+    assert p1.get_get_out_free_cards() == 0  # target has no cards
     p1_money = p1.money
     game.bankrupt(p0.id, p1.id)
 
     assert len(p1.get_properties()) == 2
+    assert p1.get_get_out_free_cards() == 1
     assert p1.money == p1_money  # target money shouldn't changes because p0 has no money
 
 

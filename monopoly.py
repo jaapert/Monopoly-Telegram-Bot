@@ -2,12 +2,12 @@
 #!/usr/bin/env python3
 from __future__ import unicode_literals
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 import random
 
-from PIL import Image, ImageDraw
-from colorhash import ColorHash
-import prettytable
+from PIL import Image, ImageDraw  # type: ignore
+from colorhash import ColorHash  # type: ignore
+import prettytable  # type: ignore
 
 class Dice:
     def __init__(self, dice_count, sides):
@@ -190,7 +190,7 @@ class Property:
         self.hotel_cost = hotel_cost
         self.cost = cost
         self.mortgaged = False
-        self.owner = None
+        self.owner: Optional[Player] = None
 
 
     def add_house(self):
@@ -311,7 +311,7 @@ class Game:
         self.dice = Dice(2, 6)
         self.has_doubles = False
         # Make pending payments a list of tuples in the form (from, to, amount)
-        self.pending_payments = []
+        self.pending_payments: List[Tuple[Player,Player,int]] = []
         self.last_roll = [-1]
         # (player_1, player_2, money_from_1, money_from_2, props_from_1,
         # props_from_2, cards_from_1, cards_from_2, agreed_1, agreed_2)
@@ -1480,25 +1480,26 @@ class Game:
                 self.send_message(f"You still have a payment of {amount} pending to {who.name}, you can only bankrupt to them")
                 return
 
+        msg = ""
         if player_2.is_bank():
             for prop in player_1.get_properties():
                 prop.set_owner(None)
                 self.available_properties.append(prop)
         else:
-            # Hack. If we're 500 in debt (so money=-500), we do not want to trade the -500, that would cost the other party
-            # the trade function blocks if trade more than you have, so we hack it here by setting the minimum a user has to 0
-            player_1.money = max(0, player_1.get_money())
-            
-            name = player_2.get_name()
-            self.pending_trade = (player_1, player_2, player_1.get_money(), 0, player_1.get_properties(), [],
-                                  player_1.get_get_out_free_cards(), 0, True, True)
-            self.trade()
-            if len(player_1.get_properties()) > 0:
-                self.pending_trade = (player_1, player_2, player_1.get_money(), 0, player_1.get_properties(), [],
-                                      player_1.get_get_out_free_cards(), 0, True, True)
-                self.trade()
+            msg = f"transferring: ${player_1.get_money()} and #{player_1.get_get_out_free_cards()} cards\n"
+
+            player_2.add_money(max(0, player_1.get_money()))
+
+            for prop in player_1.get_properties():
+                prop.set_owner(player_2)
+                player_2.add_property(prop)
+                msg += f"property: {prop.get_name()}\n"
+
+            for card in range(0, player_1.get_get_out_free_cards()):
+                player_2.add_out_free_card()
 
         self.send_message(player_1.get_name() + " has bankrupted to " + player_2.get_name() + "!")
+        self.send_message(msg)
 
         self.ids.remove(self.players[id_1].get_id())
         self.players.pop(id_1)
@@ -1573,8 +1574,8 @@ class Game:
 
 
 def create_bot():
-    import telegram
-    from telegram.error import TelegramError
+    import telegram  # type: ignore
+    from telegram.error import TelegramError  # type: ignore
 
     with open("api_key.txt", 'r', encoding="utf-8") as f:
         TOKEN = f.read().rstrip()
