@@ -98,7 +98,7 @@ def test_bankrupt_to_other_user_in_debt(game):
 
     p0.money = -500
 
-    game.pending_payments.append((p0.id, p1.id, 500))
+    game.pending_payments.append((p0, p1, 500))
 
     cur_turn = game.turn
     assert cur_turn == p0.id
@@ -140,7 +140,7 @@ def test_bankrupt_to_other_user(game):
     assert p1.money == (p1_money + 1500)
 
 
-def test_bankrupt_bankr(game):
+def test_bankrupt_bank(game):
     p0 = game.get_players()[0]
 
     p0.set_position(1)

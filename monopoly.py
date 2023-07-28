@@ -1475,8 +1475,6 @@ class Game:
             
             if who == None:  # bank? wtf is this code m8
                 who = Bank()
-            else:
-                who = self.get_player_by_local_id(who)
 
             if player_2 != who:
                 self.send_message(f"You still have a payment of {amount} pending to {who.name}, you can only bankrupt to them")
