@@ -105,14 +105,14 @@ static_responses = {
                 /trade will commence the pending trade if both players have agreed.
                 /setuptrade [player_id] will begin a trade between you and the player with that ID.
                 /assets will send you your current money, properties, and cards.
-                /aa will display everyone's assets in the chat."
-                'invalid_nickname': "That is not a valid nickname."
-                'join_game_not_pending': "You cannot join; a game is not currently pending!"
-                'leave_failure': "You cannot leave. You are here forever. Good luck!"
-                'leave_game_not_pending_failure': "You cannot leave the game; there's no game pending!"
-                'leave_id_missing_failure': "You cannot leave the game; you aren't in it!"
-                'listplayers_failure': "A game has not been started, so there aren't any players to list!"
-                'new_game': "A  new game has been created for this chat and is currently pending.
+                /aa will display everyone's assets in the chat.""",
+        'invalid_nickname': "That is not a valid nickname.",
+        'join_game_not_pending': "You cannot join; a game is not currently pending!",
+        'leave_failure': "You cannot leave. You are here forever. Good luck!",
+        'leave_game_not_pending_failure': "You cannot leave the game; there's no game pending!",
+        'leave_id_missing_failure': "You cannot leave the game; you aren't in it!",
+        'listplayers_failure': "A game has not been started, so there aren't any players to list!",
+        'new_game': """A  new game has been created for this chat and is currently pending.
 
                 /join [nickname] will let you join the game under a nickname or your username as a default.
                 /leave command will remove you from the game.
