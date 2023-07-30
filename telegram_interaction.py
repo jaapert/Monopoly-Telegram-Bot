@@ -70,6 +70,7 @@ def send_info(bot, chat_id, game, user_id, send_id):
     cards = player.get_get_out_free_cards()
     total_assets = player.get_total_assets()
     bot.send_message(chat_id=send_id,
+                     parse_mode=telegram.constants.ParseMode.MARKDOWN_V2,
                      text=props + "\n\n" + player.get_name() + " money: $" + str(money) +
                                   "\n\n" + player.get_name() + " cards: " + str(cards) +
                                   "\n\n" + player.get_name() + " total assets: $" + str(total_assets) +

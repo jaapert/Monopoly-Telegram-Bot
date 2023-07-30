@@ -8,6 +8,8 @@ import random
 from PIL import Image, ImageDraw  # type: ignore
 from colorhash import ColorHash  # type: ignore
 import prettytable  # type: ignore
+import telegram  # type: ignore
+from telegram.error import TelegramError  # type: ignore
 
 class Dice:
     def __init__(self, dice_count, sides):
@@ -1574,9 +1576,6 @@ class Game:
 
 
 def create_bot():
-    import telegram  # type: ignore
-    from telegram.error import TelegramError  # type: ignore
-
     with open("api_key.txt", 'r', encoding="utf-8") as f:
         TOKEN = f.read().rstrip()
 
