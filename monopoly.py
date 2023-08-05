@@ -1416,7 +1416,7 @@ class Game:
         if type(self.board[position]) == OtherProperty:
             property = self.board[position]
             self.send_message("You landed on " + property.get_name() + "!")
-            if property.morgaged:
+            if property.mortgaged:
                 self.send_message("This property is mortgaged!")
                 return
 
